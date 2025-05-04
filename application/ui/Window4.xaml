@@ -1,0 +1,28 @@
+<Window x:Class="ConsoleApp1.Window4"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Quiz beginnen" Height="360" Width="600" Background="#232533" WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
+    <Grid Background="#232533">
+        <Border Background="#191A23" CornerRadius="16" Margin="16" VerticalAlignment="Center" HorizontalAlignment="Center" MinHeight="280">
+            <StackPanel Margin="32,24" VerticalAlignment="Center" HorizontalAlignment="Stretch">
+                <TextBlock Text="Quiz beginnen" Foreground="#E6E8F0" FontSize="32" FontWeight="Bold" Margin="0,0,0,24"/>
+                <TextBlock Text="Kategorie" Foreground="#E6E8F0" FontSize="18" Margin="0,0,0,8"/>
+                <ComboBox Height="40" FontSize="18" Background="#232533" Foreground="#E6E8F0" BorderThickness="0" Margin="0,0,0,24" SelectedIndex="0">
+                    <ComboBoxItem Content="Geschichte"/>
+                </ComboBox>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button Height="40" Width="150" FontSize="18" FontWeight="SemiBold" Background="#4B5AFF" Foreground="#E6E8F0" BorderThickness="0">
+                        <Button.Template>
+                            <ControlTemplate TargetType="Button">
+                                <Border Background="{TemplateBinding Background}" CornerRadius="14">
+                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                            </ControlTemplate>
+                        </Button.Template>
+                        Quiz beginnen
+                    </Button>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window>
