@@ -55,8 +55,8 @@ namespace QuizGame.API
             request.Content = new StringContent(jsonBody, Encoding.UTF8, "application/json");
 
             var response = await client.SendAsync(request);
-
-            return new Response(await response.Content.ReadAsStringAsync());
+          
+            new Response(response);
         }
 
         private static string EscapeForJson(string input)
