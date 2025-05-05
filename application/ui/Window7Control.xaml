@@ -9,8 +9,8 @@
                 <Border Background="#23232b" Padding="0,18,0,16" CornerRadius="16,16,0,0">
                     <TextBlock Text="Statistik" FontSize="24" FontWeight="Bold" Foreground="#f3f3f7" HorizontalAlignment="Left" Margin="8,0,0,0"/>
                 </Border>
-                <!-- Verlauf der Spielergebnis -->
-                <TextBlock Text="Verlauf der Spielergebnis" FontSize="15" Foreground="#7e8193" Margin="16,0,0,0"/>
+                <!-- Verlauf der Spielergebnisse -->
+                <TextBlock Text="Verlauf der Spielergebnisse" FontSize="15" Foreground="#7e8193" Margin="16,0,0,0"/>
                 <!-- Simple Line Chart Placeholder -->
                 <Border Background="#23232b" Margin="16,8,16,0" Height="56" CornerRadius="8" BorderBrush="#262631" BorderThickness="1">
                     <Canvas>
@@ -18,11 +18,11 @@
                         <Polyline Points="8,40 28,28 48,36 68,24 88,32 108,28 128,36 148,20" Stroke="#4e7cff" StrokeThickness="2"/>
                     </Canvas>
                 </Border>
-                <!-- Gurchschnittiche Winschstat -->
+                <!-- Durchschnittliche Winstatistik -->
                 <StackPanel Orientation="Horizontal" Margin="16,12,16,0" VerticalAlignment="Center">
-                    <TextBlock Text="Gurchschnittiche" FontSize="15" Foreground="#7e8193"/>
+                    <TextBlock Text="Durchschnittliche" FontSize="15" Foreground="#7e8193"/>
                     <TextBlock Text=" " Width="8"/>
-                    <TextBlock Text="Winsschtat" FontSize="15" Foreground="#7e8193"/>
+                    <TextBlock Text="Winstatistik" FontSize="15" Foreground="#7e8193"/>
                     <TextBlock Text=" " Width="16"/>
                     <TextBlock Text="7,5" FontSize="15" Foreground="#bfc1ce" HorizontalAlignment="Right"/>
                 </StackPanel>

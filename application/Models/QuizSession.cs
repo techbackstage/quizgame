@@ -2,6 +2,9 @@ using System;
 
 namespace application.Models;
 
+/// <summary>
+/// Represents a quiz session for tracking user results.
+/// </summary>
 public class QuizSession
 {
     public int QuizSessionId { get; set; }
