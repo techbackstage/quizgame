@@ -19,7 +19,7 @@ namespace application
             }
             catch (System.Exception ex)
             {
-                System.Windows.MessageBox.Show($"An error occurred during application startup: {ex.Message}", "Startup Error", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+                MessageBox.Show($"An error occurred during application startup: {ex.Message}", "Startup Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 Shutdown(-1);
             }
         }
