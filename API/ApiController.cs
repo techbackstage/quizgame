@@ -11,7 +11,7 @@ namespace QuizGame.API
 		{
 			Console.WriteLine(Environment.getConfig("API_TOKEN"));
 
-			new Request().Call("Gebe mir 10 Quizfragen zu der Kategorie Märchen.");
+			new Request().Call("Gib mir eine Frage mit 2 Antwortoptionen wovon nur eine richtig sein soll. Trenne die Frage von den Antworten mit '###' und die einzelnen Antworten mit '#?#'.");
 
 			Console.ReadLine();
 		}

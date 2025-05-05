@@ -2,6 +2,10 @@ using QuizGame;
 using QuizGame.API;
 using System;
 using System.Diagnostics;
+using System;
+using System.Net.Http;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace QuizGame.API
 {
@@ -17,45 +21,47 @@ namespace QuizGame.API
             string request = bash.Replace("$CHUTES_API_TOKEN", Request.Bareer);
             request = bash.Replace("$CHUTES_REQUEST_MESSAGE", message);
 
-            Request.CallBash(request);
+            Request.CallBash(message);
 
             return "";
         }
 
-        private static void CallBash(string request)
+        private static async void CallBash(string message)
         {
-            // Prozess erstellen, um den Bash-Befehl auszuführen
-            var process = new Process
-            {
-                StartInfo = new ProcessStartInfo
-                {
-                    FileName = @"C:\Program Files\Git\bin\bash.exe",  // Pfad zur Git Bash
-                    Arguments = $"-c \"{request}\"",  // Der Befehl als Argument an bash übergeben
-                    RedirectStandardOutput = true,  // Standardausgabe umleiten
-                    RedirectStandardError = true,  // Standardfehler umleiten
-                    UseShellExecute = false,  // Muss auf false gesetzt werden, um Ausgabe zu bekommen
-                    CreateNoWindow = true  // Verhindert, dass ein neues Terminal-Fenster geöffnet wird
-                }
-            };
+            string apiToken = Request.Bareer;
+            string requestMessage = message;
 
-            process.Start();
+            using var client = new HttpClient();
 
-            // Ausgabe und Fehler lesen
-            string output = process.StandardOutput.ReadToEnd();
-            string error = process.StandardError.ReadToEnd();
+            var request = new HttpRequestMessage(HttpMethod.Post, "https://llm.chutes.ai/v1/chat/completions");
 
-            process.WaitForExit();  // Warten, bis der Befehl beendet ist
+            request.Headers.Add("Authorization", $"Bearer {apiToken}");
+            request.Headers.Add("Accept", "application/json");
 
-            // Ausgabe anzeigen
-            Console.WriteLine("OUTPUT:");
-            Console.WriteLine(output);
+            var jsonBody = $@"
+        {{
+            ""model"": ""deepseek-ai/DeepSeek-V3-0324"",
+            ""messages"": [
+                {{
+                    ""role"": ""user"",
+                    ""content"": ""{EscapeForJson(requestMessage)}""
+                }}
+            ],
+            ""stream"": false,
+            ""max_tokens"": 1024,
+            ""temperature"": 0.7
+        }}";
 
-            // Fehler anzeigen, falls vorhanden
-            if (!string.IsNullOrWhiteSpace(error))
-            {
-                Console.WriteLine("ERROR:");
-                Console.WriteLine(error);
-            }
+            request.Content = new StringContent(jsonBody, Encoding.UTF8, "application/json");
+
+            var response = await client.SendAsync(request);
+
+            return new Response(await response.Content.ReadAsStringAsync());
+        }
+
+        private static string EscapeForJson(string input)
+        {
+            return input.Replace("\\", "\\\\").Replace("\"", "\\\"");
         }
     }
 }
