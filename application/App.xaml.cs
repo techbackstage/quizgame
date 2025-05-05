@@ -10,7 +10,7 @@ public partial class App : Application
 {
     private void Application_Startup(object sender, StartupEventArgs e)
     {
-        var w1 = new Window1();
-        w1.Show();
+        var main = new MainWindow();
+        main.Show();
     }
 }
