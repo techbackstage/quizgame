@@ -22,7 +22,7 @@
                 <!-- Filters -->
                 <StackPanel Orientation="Vertical" Margin="18,8,0,0">
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                        <TextBlock Text="Durchschnittllche Punktlzahl" FontSize="15" Foreground="#7e8193"/>
+                        <TextBlock Text="Durchschnittliche Punktzahl" FontSize="15" Foreground="#7e8193"/>
                         <TextBlock Text="✔" FontSize="15" Foreground="#7e8193" Margin="8,0,0,0"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,2,0,0">
@@ -34,7 +34,7 @@
                 <Border Height="1" Background="#262631" Margin="18,18,18,0"/>
                 <!-- History -->
                 <StackPanel Orientation="Vertical" Margin="18,8,0,0">
-                    <TextBlock Text="Johrgoegemen" FontSize="15" Foreground="#7e8193" Margin="0,0,0,6"/>
+                    <TextBlock Text="Jahresergebnisse" FontSize="15" Foreground="#7e8193" Margin="0,0,0,6"/>
                     <StackPanel Orientation="Horizontal" Margin="0,0,0,2">
                         <TextBlock Text="10. Apr. 2024" FontSize="15" Foreground="#bfc1ce" Width="120"/>
                         <TextBlock Text="9 / 10" FontSize="15" Foreground="#bfc1ce"/>
