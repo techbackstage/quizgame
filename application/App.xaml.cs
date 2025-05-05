@@ -1,16 +1,16 @@
 ﻿using System.Windows;
-using ConsoleApp1;
 
-namespace application;
-
-/// <summary>
-/// Interaction logic for App.xaml
-/// </summary>
-public partial class App : Application
+namespace application
 {
-    private void Application_Startup(object sender, StartupEventArgs e)
+    /// <summary>
+    /// Interaction logic for App.xaml
+    /// </summary>
+    public partial class App : Application
     {
-        var main = new MainWindow();
-        main.Show();
+        private void Application_Startup(object sender, StartupEventArgs e)
+        {
+            var main = new MainWindow();
+            main.Show();
+        }
     }
 }

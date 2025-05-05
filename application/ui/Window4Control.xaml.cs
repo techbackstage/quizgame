@@ -1,6 +1,6 @@
 using System.Windows.Controls;
 
-namespace ConsoleApp1
+namespace application
 {
     public partial class Window4Control : UserControl
     {

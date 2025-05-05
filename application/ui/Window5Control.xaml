@@ -1,4 +1,4 @@
-<UserControl x:Class="ConsoleApp1.Window5Control"
+<UserControl x:Class="application.Window5Control"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              Background="#23232b">
@@ -11,14 +11,14 @@
                 </Border>
                 <!-- Question -->
                 <Border Background="#23232b" Padding="0,0,0,18">
-                    <TextBlock Text="Welches Jahr wird als Beginn des Zweiten Weltkriegs angesehen?" TextWrapping="Wrap" FontSize="17" Foreground="#bfc1ce" Margin="18,0,18,0"/>
+                    <TextBlock x:Name="QuestionTextBlock" Text="" TextWrapping="Wrap" FontSize="17" Foreground="#bfc1ce" Margin="18,0,18,0"/>
                 </Border>
                 <!-- Answers -->
                 <StackPanel Orientation="Vertical" Margin="12,0,12,18" Background="#23232b">
-                    <Button Content="1833" Height="38" Margin="0,0,0,10" Background="#23232b" Foreground="#bfc1ce" FontSize="16" BorderBrush="#262631" BorderThickness="2" HorizontalContentAlignment="Left" Padding="18,0,0,0"/>
-                    <Button Content="1914" Height="38" Margin="0,0,0,10" Background="#23232b" Foreground="#bfc1ce" FontSize="16" BorderBrush="#262631" BorderThickness="2" HorizontalContentAlignment="Left" Padding="18,0,0,0"/>
-                    <Button Content="1945" Height="38" Margin="0,0,0,10" Background="#23232b" Foreground="#bfc1ce" FontSize="16" BorderBrush="#262631" BorderThickness="2" HorizontalContentAlignment="Left" Padding="18,0,0,0"/>
-                    <Button Content="1919" Height="38" Margin="0" Background="#23232b" Foreground="#bfc1ce" FontSize="16" BorderBrush="#262631" BorderThickness="2" HorizontalContentAlignment="Left" Padding="18,0,0,0"/>
+                    <Button x:Name="AnswerButton1" Content="" Height="38" Margin="0,0,0,10" Background="#23232b" Foreground="#bfc1ce" FontSize="16" BorderBrush="#262631" BorderThickness="2" HorizontalContentAlignment="Left" Padding="18,0,0,0"/>
+                    <Button x:Name="AnswerButton2" Content="" Height="38" Margin="0,0,0,10" Background="#23232b" Foreground="#bfc1ce" FontSize="16" BorderBrush="#262631" BorderThickness="2" HorizontalContentAlignment="Left" Padding="18,0,0,0"/>
+                    <Button x:Name="AnswerButton3" Content="" Height="38" Margin="0,0,0,10" Background="#23232b" Foreground="#bfc1ce" FontSize="16" BorderBrush="#262631" BorderThickness="2" HorizontalContentAlignment="Left" Padding="18,0,0,0"/>
+                    <Button x:Name="AnswerButton4" Content="" Height="38" Margin="0" Background="#23232b" Foreground="#bfc1ce" FontSize="16" BorderBrush="#262631" BorderThickness="2" HorizontalContentAlignment="Left" Padding="18,0,0,0"/>
                 </StackPanel>
             </StackPanel>
         </Border>

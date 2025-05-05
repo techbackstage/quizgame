@@ -1,4 +1,4 @@
-<UserControl x:Class="ConsoleApp1.Window7Control"
+<UserControl x:Class="application.Window7Control"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              Background="#23232b">
