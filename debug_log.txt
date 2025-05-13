@@ -1,4 +1,4 @@
-13.05.2025 11:36:44: Starting Quiz App...
-13.05.2025 11:36:45: MainWindow loaded successfully.
-13.05.2025 11:36:45: MainWindow.Show() called
-13.05.2025 11:36:49: Application exited normally
+13.05.2025 11:39:03: Starting Quiz App...
+13.05.2025 11:39:04: MainWindow loaded successfully.
+13.05.2025 11:39:04: MainWindow.Show() called
+13.05.2025 11:39:09: Application exited normally
