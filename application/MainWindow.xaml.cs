@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 
 namespace application
 {
@@ -6,9 +7,16 @@ namespace application
     {
         public MainWindow()
         {
-            InitializeComponent();
-            // Show the home screen (Window1Control) by default
-            ShowHome();
+            try
+            {
+                InitializeComponent();
+                // Show the home screen (Window1Control) by default
+                ShowHome();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error initializing main window: " + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private void ShowHome()
