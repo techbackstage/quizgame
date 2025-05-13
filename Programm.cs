@@ -1,12 +1,18 @@
 using QuizGame.API;
 
-namespace QuizGame
+namespace application
 {
     class Programm
     {
+        [STAThread]
         public static void Main(string[] args)
         {
-            ApiController.Run();
+            var app = new MainWindow();
+            app.InitializeComponent();
+            app.Show();
+            //ApiController.Run();
+            
+            Console.WriteLine("TEst");
         }
     }
 }
