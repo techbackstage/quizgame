@@ -7,9 +7,9 @@
             <StackPanel Margin="32,24" VerticalAlignment="Center" HorizontalAlignment="Stretch">
                 <TextBlock Text="Kategorie hinzufügen" Foreground="#E6E8F0" FontSize="32" FontWeight="Bold" Margin="0,0,0,24"/>
                 <TextBlock Text="Kategorie  Name" Foreground="#E6E8F0" FontSize="18" Margin="0,0,0,8"/>
-                <TextBox Height="40" FontSize="18" Background="#232533" Foreground="#E6E8F0" BorderThickness="0" Margin="0,0,0,24"/>
+                <TextBox x:Name="CategoryNameBox" Height="40" FontSize="18" Background="#232533" Foreground="#E6E8F0" BorderThickness="0" Margin="0,0,0,24"/>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                    <Button Height="40" Width="120" FontSize="18" FontWeight="SemiBold" Background="#4B5AFF" Foreground="#E6E8F0" BorderThickness="0" Margin="0,0,0,0">
+                    <Button x:Name="SaveButton" Height="40" Width="120" FontSize="18" FontWeight="SemiBold" Background="#4B5AFF" Foreground="#E6E8F0" BorderThickness="0" Margin="0,0,0,0" Click="SaveButton_Click">
                         <Button.Template>
                             <ControlTemplate TargetType="Button">
                                 <Border Background="{TemplateBinding Background}" CornerRadius="14">

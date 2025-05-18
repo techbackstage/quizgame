@@ -6,65 +6,39 @@
         <Border Background="#191A23" CornerRadius="16" Margin="16" VerticalAlignment="Center" HorizontalAlignment="Center">
             <StackPanel Margin="32,24" VerticalAlignment="Center" HorizontalAlignment="Stretch">
                 <TextBlock Text="Kategorien" Foreground="#E6E8F0" FontSize="32" FontWeight="Bold" Margin="0,0,0,24"/>
-                <!-- Kategorie 1 -->
-                <Grid Margin="0,0,0,8">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
-                    <StackPanel Orientation="Vertical">
-                        <TextBlock Text="Geschichte" Foreground="#E6E8F0" FontSize="20" FontWeight="SemiBold"/>
-                        <TextBlock Text="Fragen ragen" Foreground="#A6A8B8" FontSize="14"/>
-                    </StackPanel>
-                    <Button Grid.Column="1" Width="28" Height="28" Margin="8,0,0,0" Background="Transparent" BorderThickness="0">
-                        <TextBlock Text="≡" Foreground="#A6A8B8" FontSize="18" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                    </Button>
-                    <Button Grid.Column="2" Width="28" Height="28" Margin="8,0,0,0" Background="Transparent" BorderThickness="0">
-                        <TextBlock Text="🗑" Foreground="#A6A8B8" FontSize="16" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                    </Button>
-                </Grid>
-                <Separator Background="#232533" Height="1" Margin="0,0,0,8"/>
-                <!-- Kategorie 2 -->
-                <Grid Margin="0,0,0,8">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
-                    <StackPanel Orientation="Vertical">
-                        <TextBlock Text="Wissenschaft" Foreground="#E6E8F0" FontSize="20" FontWeight="SemiBold"/>
-                        <TextBlock Text="Fragen ragen" Foreground="#A6A8B8" FontSize="14"/>
-                    </StackPanel>
-                    <Button Grid.Column="1" Width="28" Height="28" Margin="8,0,0,0" Background="Transparent" BorderThickness="0">
-                        <TextBlock Text="≡" Foreground="#A6A8B8" FontSize="18" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                    </Button>
-                    <Button Grid.Column="2" Width="28" Height="28" Margin="8,0,0,0" Background="Transparent" BorderThickness="0">
-                        <TextBlock Text="🗑" Foreground="#A6A8B8" FontSize="16" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                    </Button>
-                </Grid>
-                <Separator Background="#232533" Height="1" Margin="0,0,0,8"/>
-                <!-- Kategorie 3 -->
-                <Grid Margin="0,0,0,16">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
-                    <StackPanel Orientation="Vertical">
-                        <TextBlock Text="Kunst" Foreground="#E6E8F0" FontSize="20" FontWeight="SemiBold"/>
-                        <TextBlock Text="Fragen ragen" Foreground="#A6A8B8" FontSize="14"/>
-                    </StackPanel>
-                    <Button Grid.Column="1" Width="28" Height="28" Margin="8,0,0,0" Background="Transparent" BorderThickness="0">
-                        <TextBlock Text="≡" Foreground="#A6A8B8" FontSize="18" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                    </Button>
-                    <Button Grid.Column="2" Width="28" Height="28" Margin="8,0,0,0" Background="Transparent" BorderThickness="0">
-                        <TextBlock Text="🗑" Foreground="#A6A8B8" FontSize="16" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                    </Button>
-                </Grid>
-                <Button Height="48" FontSize="20" FontWeight="SemiBold" Background="#4B5AFF" Foreground="#E6E8F0" BorderThickness="0" Margin="0,8,0,0" HorizontalAlignment="Stretch">
+                <!-- ItemsControl for dynamic categories -->
+                <ItemsControl x:Name="CategoryListPanel" ItemsSource="{Binding Categories}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Margin="0,0,0,8">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Orientation="Vertical">
+                                    <TextBlock Text="{Binding Name}" Foreground="#E6E8F0" FontSize="20" FontWeight="SemiBold"/>
+                                    <TextBlock Text="Fragen ragen" Foreground="#A6A8B8" FontSize="14"/>
+                                </StackPanel>
+                                <Button Grid.Column="1" Width="28" Height="28" Margin="8,0,0,0" Background="Transparent" BorderThickness="0"
+                                        Command="{Binding DataContext.ShowQuestionsCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                        CommandParameter="{Binding}">
+                                    <TextBlock Text="≡" Foreground="#A6A8B8" FontSize="18" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                </Button>
+                                <Button Grid.Column="2" Width="28" Height="28" Margin="8,0,0,0" Background="Transparent" BorderThickness="0"
+                                        Command="{Binding DataContext.DeleteCategoryCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                        CommandParameter="{Binding}">
+                                    <TextBlock Text="🗑" Foreground="#A6A8B8" FontSize="16" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                </Button>
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+                <!-- Add Category Button -->
+                <Button x:Name="AddCategoryButton" Height="48" FontSize="20" FontWeight="SemiBold" Background="#4B5AFF" Foreground="#E6E8F0"
+                        BorderThickness="0" Margin="0,8,0,0" HorizontalAlignment="Stretch">
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                        <TextBlock Text="Frage hinzufügen"/>
+                        <TextBlock Text="Kategorie hinzufügen"/>
                         <TextBlock Text=" ▼" FontSize="18"/>
                     </StackPanel>
                     <Button.Template>

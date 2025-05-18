@@ -1,11 +1,9 @@
-﻿// filepath: c:\Users\Erik\RiderProjects\quizgame\Programm.cs
-using System;
-using System.Windows;
+﻿using System.Windows;
 using System.IO;
 
 namespace QuizGame
 {
-    public static class Programm
+    public static class Program
     {
         [STAThread]
         public static void Main()
