@@ -7,7 +7,7 @@
             <StackPanel>
                 <!-- Title -->
                 <Border Background="#23232b" Padding="0,18,0,16" CornerRadius="16,16,0,0">
-                    <TextBlock Text="Frage 3 von 10" FontSize="26" FontWeight="Bold" Foreground="#f3f3f7" HorizontalAlignment="Left" Margin="18,0,0,0"/>
+                    <TextBlock x:Name="QuestionProgressTextBlock" Text="Frage 1 von 10" FontSize="26" FontWeight="Bold" Foreground="#f3f3f7" HorizontalAlignment="Left" Margin="18,0,0,0"/>
                 </Border>
                 <!-- Question -->
                 <Border Background="#23232b" Padding="0,0,0,18">

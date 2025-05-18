@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows;
 using application.Data;
+using application.Models;
 
 namespace application
 {
@@ -50,14 +51,14 @@ namespace application
         private void ShowQuizStart()
         {
             var quiz = new Window4Control();
-            quiz.QuizBeginnenButton.Click += (s, e) => ShowQuizLayout();
+            quiz.QuizBeginnenButton.Click += (s, e) => ShowQuizLayout(quiz.SelectedCategory);
             quiz.ReturnButton.Click += (s, e) => ShowHome();
             MainContent.Content = quiz;
         }
 
-        private void ShowQuizLayout()
+        private void ShowQuizLayout(Category selectedCategory)
         {
-            var quizLayout = new Window5Control();
+            var quizLayout = new Window5Control(selectedCategory);
             MainContent.Content = quizLayout;
         }
     }

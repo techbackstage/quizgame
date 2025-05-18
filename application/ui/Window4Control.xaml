@@ -12,8 +12,14 @@
                 </StackPanel>
                 <TextBlock Text="Quiz beginnen" Foreground="#E6E8F0" FontSize="32" FontWeight="Bold" Margin="0,0,0,24"/>
                 <TextBlock Text="Kategorie" Foreground="#E6E8F0" FontSize="18" Margin="0,0,0,8"/>
-                <ComboBox Height="40" FontSize="18" Background="#232533" Foreground="#E6E8F0" BorderThickness="0" Margin="0,0,0,24" SelectedIndex="0">
-                    <ComboBoxItem Content="Geschichte"/>
+                <ComboBox x:Name="CategoryComboBox" Height="40" FontSize="18" Background="#2A2C3C" Foreground="#FFFFFF" BorderThickness="1" BorderBrush="#3D4054" Margin="0,0,0,24"
+                         ItemsSource="{Binding Categories}" DisplayMemberPath="Name" SelectedValuePath="CategoryId">
+                    <ComboBox.Resources>
+                        <SolidColorBrush x:Key="{x:Static SystemColors.WindowBrushKey}" Color="#2A2C3C"/>
+                        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#4B5AFF"/>
+                        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="White"/>
+                        <SolidColorBrush x:Key="{x:Static SystemColors.WindowTextBrushKey}" Color="White"/>
+                    </ComboBox.Resources>
                 </ComboBox>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                     <Button x:Name="QuizBeginnenButton" Height="40" Width="150" FontSize="18" FontWeight="SemiBold" Background="#4B5AFF" Foreground="#E6E8F0" BorderThickness="0">
