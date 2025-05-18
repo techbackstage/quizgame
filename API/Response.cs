@@ -16,14 +16,26 @@ namespace QuizGame.API
         {
             readResponse(response);
             JObject jsonObject = JObject.Parse(this.content);
-            this.content = jsonObject["choices"][0]["message"]["content"].ToString();
+            
+            var contentToken = jsonObject["choices"]?[0]?["message"]?["content"];
+            if (contentToken != null)
+            {
+                this.content = contentToken.ToString();
+            }
+            else
+            {
+                this.content = "";
+            }
 
             new Parser(this.content).parse();
         }
 
         protected async void readResponse(HttpResponseMessage? response)
         {
-            this.content = await response.Content.ReadAsStringAsync();
+            if (response != null)
+            {
+                this.content = await response.Content.ReadAsStringAsync();
+            }
         }
 
         public string getContent()

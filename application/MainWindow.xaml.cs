@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows;
+using application.Data;
 
 namespace application
 {
@@ -9,6 +10,11 @@ namespace application
         {
             try
             {
+                // Ensure the database is created
+                using (var db = new QuizDbContext())
+                {
+                    db.Database.EnsureCreated();
+                }
                 InitializeComponent();
                 // Show the home screen (Window1Control) by default
                 ShowHome();

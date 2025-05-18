@@ -1,0 +1,29 @@
+<Window x:Class="application.QuestionsForCategoryWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Fragen der Kategorie" Height="400" Width="500" Background="#232533" WindowStartupLocation="CenterScreen">
+    <Grid Background="#232533">
+        <Border Background="#191A23" CornerRadius="16" Margin="16">
+            <StackPanel Margin="24">
+                <TextBlock x:Name="CategoryTitle" Text="Fragen" Foreground="#E6E8F0" FontSize="26" FontWeight="Bold" Margin="0,0,0,16"/>
+                <ItemsControl x:Name="QuestionsList">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Margin="0,0,0,8">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="{Binding Text}" Foreground="#E6E8F0" FontSize="16"/>
+                                <Button Grid.Column="1" Width="28" Height="28" Margin="8,0,0,0" Background="Transparent" BorderThickness="0" Command="{Binding DataContext.DeleteQuestionCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}">
+                                    <TextBlock Text="🗑" Foreground="#A6A8B8" FontSize="16" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                </Button>
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+                <Button Content="Schließen" Height="36" Width="100" Margin="0,16,0,0" HorizontalAlignment="Right" Click="Close_Click"/>
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window>

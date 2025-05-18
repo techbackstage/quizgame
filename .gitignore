@@ -3,6 +3,11 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/main/VisualStudio.gitignore
 
+# Log files
+app_log.txt
+debug_log.txt
+startup_log.txt
+
 # Database files
 application/Migrations
 *.db
