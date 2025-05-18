@@ -17,7 +17,10 @@ namespace QuizGame.API
         {
             var questions = ParseQuestionsAndAnswers(this.rawContent);
 
-            // Ausgabe der Fragen und Antworten
+            // Store the questions in ParserStorage
+            ParserStorage.StoreQuestions(questions);
+
+            // Ausgabe der Fragen und Antworten fÃ¼r Debug-Zwecke
             foreach (var question in questions)
             {
                 Console.WriteLine($"Frage: {question.Text}");
@@ -35,7 +38,7 @@ namespace QuizGame.API
         {
             var questions = new List<Question>();
 
-        // Regex zum Extrahieren der Fragen (zwischen #?# und #*#) und Antworten (zwischen #-# und +# für die richtige Antwort)
+        // Regex zum Extrahieren der Fragen (zwischen #?# und #*#) und Antworten (zwischen #-# und +# fÃ¼r die richtige Antwort)
         var questionRegex = new Regex(@"#\?#(.*?)#\*#", RegexOptions.Singleline);
         var answerRegex = new Regex(@"#-#(.*?)#-#", RegexOptions.Singleline);
         var correctAnswerRegex = new Regex(@"\+#(.*?)#-#", RegexOptions.Singleline);
@@ -58,7 +61,7 @@ namespace QuizGame.API
                 var answerText = answerMatch.Groups[1].Value.Trim();
                 bool isCorrect = false;
 
-                // Prüfen, ob die Antwort korrekt ist
+                // PrÃ¼fen, ob die Antwort korrekt ist
                 if (!correctAnswerFound && correctAnswerRegex.IsMatch(answerMatch.Value))
                 {
                     isCorrect = true;
