@@ -33,7 +33,7 @@ namespace QuizGame.Application.UI
         private void LoadCategories()
         {
             Categories.Clear();
-            using (var db = new QuizDbContext())
+            using (var db = QuizDbContext.getContext())
             {
                 foreach (var cat in db.Categories.Include(c => c.Questions).ToList())
                     Categories.Add(cat);
@@ -48,7 +48,7 @@ namespace QuizGame.Application.UI
                 var result = MessageBox.Show($"Kategorie '{cat.Name}' wirklich löschen?", "Löschen bestätigen", MessageBoxButton.YesNo, MessageBoxImage.Warning);
                 if (result == MessageBoxResult.Yes)
                 {
-                    using (var db = new QuizDbContext())
+                    using (var db = QuizDbContext.getContext())
                     {
                         var dbCat = db.Categories.Include(c => c.Questions).FirstOrDefault(c => c.CategoryId == cat.CategoryId);
                         if (dbCat != null)
@@ -84,9 +84,9 @@ namespace QuizGame.Application.UI
                     Mouse.OverrideCursor = Cursors.Wait;
                     
                     // Save questions to database
-                    using (var db = new QuizDbContext())
+                    using (var db = QuizDbContext.getContext())
                     {
-                        var questions = ApiController.Run(category.Name);
+                        var questions = ApiController.Run("Tennis");
                         
                         if (questions.Count > 0)
                         {
@@ -111,7 +111,7 @@ namespace QuizGame.Application.UI
                                 });
                             }
                             
-                            db.SaveChanges();
+                            db.SaveChangesAsync();
                             
                             // Show success message
                             System.Windows.Application.Current.Dispatcher.Invoke(() => {

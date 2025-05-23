@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.SqlServer;
 using QuizGame.Application.Model;
 
 namespace QuizGame.Application.Database;
@@ -10,11 +11,28 @@ public class QuizDbContext : DbContext
     public DbSet<AnswerOption> AnswerOptions { get; set; }
     public DbSet<QuizSession> QuizSessions { get; set; }
 
-    protected override void OnConfiguring(DbContextOptionsBuilder options)
+    public static QuizDbContext getContext()
     {
-        // Use absolute path to ensure correct database file is used
-        var dbPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "quiz.db");
-        var fullPath = System.IO.Path.GetFullPath(dbPath);
-        options.UseSqlite($"Data Source={fullPath}");
+        var options = new DbContextOptionsBuilder<QuizDbContext>()
+                .UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=QuizDb;Trusted_Connection=True;")
+                .Options;
+
+        return new QuizDbContext(options);
+    }
+
+    public QuizDbContext(DbContextOptions<QuizDbContext> options)
+       : base(options)
+    {
+    }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+
+        modelBuilder.Entity<Question>()
+            .HasMany(q => q.AnswerOptions)
+            .WithOne(a => a.Question)
+            .HasForeignKey(a => a.QuestionId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

@@ -1,5 +1,11 @@
 ﻿using System.Windows;
 using System.IO;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using QuizGame.Application.Database;
+using QuizGame.Application;
 
 namespace QuizGame
 {
@@ -17,8 +23,8 @@ namespace QuizGame
                 var app = new QuizGame.Application.App();
                 
                 // Create the main window explicitly - this is key for visibility
-                var mainWindow = new QuizGame.Application.MainWindow();
-                
+                var mainWindow = new MainWindow();
+
                 // Add window loaded event to log when the window actually appears
                 mainWindow.Loaded += (s, e) =>
                 {

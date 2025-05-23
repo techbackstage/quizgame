@@ -57,7 +57,7 @@ namespace QuizGame.Application.UI
                 // Update progress text
                 QuestionProgressTextBlock.Text = $"Frage {_questionCounter} von {TotalQuestions}";
                 
-                using (var db = new QuizDbContext())
+                using (var db = QuizDbContext.getContext())
                 {
                     // Get a random question from the selected category if provided
                     var questionQuery = db.Questions.Include(q => q.AnswerOptions).AsQueryable();

@@ -17,19 +17,15 @@ namespace QuizGame.API
         
         private static readonly string bash = "curl -X POST \\\r\n\t\thttps://llm.chutes.ai/v1/chat/completions \\\r\n\t\t-H \"Authorization: Bearer $CHUTES_API_TOKEN\" \\\r\n\t-H \"Content-Type: application/json\" \\\r\n\t-d '  {\r\n    \"model\": \"deepseek-ai/DeepSeek-V3-0324\",\r\n    \"messages\": [\r\n      {\r\n        \"role\": \"user\",\r\n        \"content\": \"$CHUTES_REQUEST_MESSAGE\"\r\n      }\r\n    ],\r\n    \"stream\": false,\r\n    \"max_tokens\": 1024,\r\n    \"temperature\": 0.7\r\n  }'";
 
-        public List<Question> questions {  get; set; }
-
         public List<Question> Call(string message)
         {
             string request = bash.Replace("$CHUTES_API_TOKEN", Request.Bareer);
             request = bash.Replace("$CHUTES_REQUEST_MESSAGE", message);
 
-            Request.CallBash(message, this);
-
-            return this.questions;
+            return Task.FromResult(CallBash(message)).GetAwaiter().GetResult();
         }
 
-        private static async void CallBash(string message, Request requestReference)
+        private List<Question> CallBash(string message)
         {
             string apiToken = Request.Bareer;
             string requestMessage = message;
@@ -57,9 +53,9 @@ namespace QuizGame.API
 
             request.Content = new StringContent(jsonBody, Encoding.UTF8, "application/json");
 
-            var response = await client.SendAsync(request);
+            var response = client.SendAsync(request).GetAwaiter().GetResult();
           
-            requestReference.questions = new Parser(new Response(response).getContent()).parse();
+            return new Parser(new Response(response).getContent()).parse();
         }
 
         private static string EscapeForJson(string input)
