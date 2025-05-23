@@ -9,14 +9,6 @@ namespace QuizGame.Application.Model;
 public class Category
 {
     public int CategoryId { get; set; }
-    
-    // Alias for CategoryId to support repository methods
-    public int Id 
-    { 
-        get => CategoryId; 
-        set => CategoryId = value; 
-    }
-    
     public string Name { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
     public virtual List<Question> Questions { get; set; } = new();
