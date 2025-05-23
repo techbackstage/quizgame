@@ -19,12 +19,5 @@ namespace QuizGame
             return config.ContainsKey (option) ? config[option].ToString() : "NO_VALUE";
         }
     }
-
-    public class SomeClass
-    {
-        private static readonly string Bareer = Environment.getConfig("API_TOKEN") ?? string.Empty;
-
-        // Rest of the class implementation
-    }
 }
 

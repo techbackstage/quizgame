@@ -3,11 +3,11 @@ using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using application.Data;
-using application.Models;
+using QuizGame.Application.Database;
+using QuizGame.Application.Model;
 using System.Linq;
 
-namespace application
+namespace QuizGame.Application.UI
 {
     public partial class Window5Control : UserControl
     {

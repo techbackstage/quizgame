@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Data.Sqlite;
-using application.Models;
+using QuizGame.Application.Model;
 using System.IO;
 
-namespace application.Data
+namespace QuizGame.Application.Database
 {
     public class CategoryRepository
     {

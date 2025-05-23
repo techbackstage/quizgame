@@ -2,14 +2,14 @@ using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using application.Data;
-using application.Models;
+using QuizGame.Application.Database;
+using QuizGame.Application.Model;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 using QuizGame.API;
 
-namespace application
+namespace QuizGame.Application.UI
 {
     public partial class Window2Control : UserControl
     {
@@ -83,24 +83,10 @@ namespace application
                     var cursor = Mouse.OverrideCursor;
                     Mouse.OverrideCursor = Cursors.Wait;
                     
-                    await Task.Run(() => {
-                        string promptTemplate = "Gib mir 5 Fragen mit 4 Antwortoptionen zur Kategorie {0} wovon nur eine richtig sein soll. " +
-                                              "Trenne Fragen mit #?#, die Frage von den Antworten mit '#*#' und die einzelnen Antworten mit '#-#' " +
-                                              "außer der richtigen Antwort, da verwende '#+#'. Die Trennzeichen sollen links und rechts vom Inhalt stehen.";
-                        
-                        string prompt = string.Format(promptTemplate, category.Name);
-                        
-                        // Call the API
-                        new Request().Call(prompt);
-                        
-                        // Give time for the asynchronous response to be processed
-                        Task.Delay(1500).Wait();
-                    });
-                    
                     // Save questions to database
                     using (var db = new QuizDbContext())
                     {
-                        var questions = GetQuestionsFromParser(category);
+                        var questions = ApiController.Run(category.Name);
                         
                         if (questions.Count > 0)
                         {
@@ -109,7 +95,7 @@ namespace application
                                 db.Questions.Add(question);
                                 
                                 // Update the UI counter by refreshing the list
-                                Application.Current.Dispatcher.Invoke(() => {
+                                System.Windows.Application.Current.Dispatcher.Invoke(() => {
                                     var dbCategory = db.Categories
                                         .Include(c => c.Questions)
                                         .FirstOrDefault(c => c.CategoryId == category.CategoryId);
@@ -128,19 +114,19 @@ namespace application
                             db.SaveChanges();
                             
                             // Show success message
-                            Application.Current.Dispatcher.Invoke(() => {
+                            System.Windows.Application.Current.Dispatcher.Invoke(() => {
                                 MessageBox.Show($"{questions.Count} Fragen für '{category.Name}' erstellt.", "Fragen generiert", 
                                     MessageBoxButton.OK, MessageBoxImage.Information);
                             });
                             
                             // Reload categories to refresh the UI
-                            Application.Current.Dispatcher.Invoke(() => {
+                            System.Windows.Application.Current.Dispatcher.Invoke(() => {
                                 LoadCategories();
                             });
                         }
                         else
                         {
-                            Application.Current.Dispatcher.Invoke(() => {
+                            System.Windows.Application.Current.Dispatcher.Invoke(() => {
                                 MessageBox.Show("Keine Fragen generiert. Bitte versuchen Sie es erneut.", 
                                     "Fehler", MessageBoxButton.OK, MessageBoxImage.Warning);
                             });
@@ -157,39 +143,6 @@ namespace application
                     MessageBox.Show($"Fehler beim Generieren von Fragen: {ex.Message}", "Fehler", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
-        }
-        
-        private List<application.Models.Question> GetQuestionsFromParser(Category category)
-        {
-            var result = new List<application.Models.Question>();
-            var parserQuestions = ParserStorage.GetQuestions();
-            
-            if (parserQuestions != null && parserQuestions.Count > 0)
-            {
-                foreach (var pq in parserQuestions)
-                {
-                    var question = new application.Models.Question
-                    {
-                        Text = pq.Text,
-                        CategoryId = category.CategoryId,
-                        DifficultyLevel = 1,
-                        AnswerOptions = new List<AnswerOption>()
-                    };
-                    
-                    foreach (var pa in pq.Answers)
-                    {
-                        question.AnswerOptions.Add(new AnswerOption
-                        {
-                            Text = pa.Text,
-                            IsCorrect = pa.IsCorrect
-                        });
-                    }
-                    
-                    result.Add(question);
-                }
-            }
-            
-            return result;
         }
 
         private void AddCategoryButton_Click(object sender, RoutedEventArgs e)

@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Windows;
-using application.Data;
-using application.Models;
+using QuizGame.Application.Database;
+using QuizGame.Application.Model;
+using QuizGame.Application.UI;
 
-namespace application
+namespace QuizGame.Application
 {
     public partial class MainWindow : Window
     {

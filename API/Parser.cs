@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using QuizGame.Application.Model;
 using System;
 
 namespace QuizGame.API
@@ -13,24 +14,9 @@ namespace QuizGame.API
             this.rawContent = content;
         }
 
-        public void parse()
+        public List<Question> parse()
         {
-            var questions = ParseQuestionsAndAnswers(this.rawContent);
-
-            // Store the questions in ParserStorage
-            ParserStorage.StoreQuestions(questions);
-
-            // Ausgabe der Fragen und Antworten für Debug-Zwecke
-            foreach (var question in questions)
-            {
-                Console.WriteLine($"Frage: {question.Text}");
-                foreach (var answer in question.Answers)
-                {
-                    string answerMark = answer.IsCorrect ? "(Richtig)" : "(Falsch)";
-                    Console.WriteLine($"  Antwort: {answer.Text} {answerMark}");
-                }
-                Console.WriteLine();
-            }
+           return ParseQuestionsAndAnswers(this.rawContent);
         }
 
         // Methode zum Parsen der Fragen und Antworten
@@ -53,7 +39,7 @@ namespace QuizGame.API
             // Antwort-Extraktion
             var answerMatches = answerRegex.Matches(input);
 
-            var answers = new List<Answer>();
+            var answers = new List<AnswerOption>();
             bool correctAnswerFound = false;
 
             foreach (Match answerMatch in answerMatches)
@@ -68,7 +54,7 @@ namespace QuizGame.API
                     correctAnswerFound = true;
                 }
 
-                answers.Add(new Answer
+                answers.Add(new AnswerOption
                 {
                     Text = answerText.Replace("#+#", ""),
                     IsCorrect = isCorrect
@@ -79,7 +65,7 @@ namespace QuizGame.API
             questions.Add(new Question
             {
                 Text = questionText,
-                Answers = answers
+                AnswerOptions = answers
             });
         }
 

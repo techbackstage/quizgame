@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace application.Models;
+namespace QuizGame.Application.Model;
 
 /// <summary>
 /// Represents a quiz question.

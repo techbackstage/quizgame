@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using application.Models;
+using QuizGame.Application.Model;
 
-namespace application.Data;
+namespace QuizGame.Application.Database;
 
 public class QuizDbContext : DbContext
 {
