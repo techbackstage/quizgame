@@ -4,9 +4,9 @@
 ## Get latest from https://github.com/github/gitignore/blob/main/VisualStudio.gitignore
 
 # Log files
-app_log.txt
-debug_log.txt
-startup_log.txt
+./app_log.txt
+./debug_log.txt
+./startup_log.txt
 
 # Database files
 application/Migrations
@@ -408,3 +408,4 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+/debug_log.txt

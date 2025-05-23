@@ -25,7 +25,7 @@ namespace QuizGame.Application.UI
         private void LoadQuestions()
         {
             Questions.Clear();
-            using (var db = new QuizDbContext())
+            using (var db = QuizDbContext.getContext())
             {
                 var cat = db.Categories.FirstOrDefault(c => c.CategoryId == _categoryId);
                 CategoryTitle.Text = cat != null ? $"Fragen für Kategorie: {cat.Name}" : "Fragen";
@@ -42,7 +42,7 @@ namespace QuizGame.Application.UI
                 var result = MessageBox.Show($"Frage wirklich löschen?", "Löschen bestätigen", MessageBoxButton.YesNo, MessageBoxImage.Warning);
                 if (result == MessageBoxResult.Yes)
                 {
-                    using (var db = new QuizDbContext())
+                    using (var db = QuizDbContext.getContext())
                     {
                         var dbQ = db.Questions.FirstOrDefault(x => x.QuestionId == q.QuestionId);
                         if (dbQ != null)
