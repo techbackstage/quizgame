@@ -5,6 +5,7 @@ using System.Windows.Input;
 using QuizGame.Application.Database;
 using QuizGame.Application.Model;
 using System.Linq;
+using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 using QuizGame.API;
@@ -86,12 +87,14 @@ namespace QuizGame.Application.UI
                     // Save questions to database
                     using (var db = QuizDbContext.getContext())
                     {
-                        var questions = ApiController.Run("Tennis");
-                        
+                        var questions = ApiController.Run("Schule");
+                    
                         if (questions.Count > 0)
                         {
                             foreach (var question in questions)
                             {
+                                question.CategoryId = db.Categories.First(category => category.Name == "Schule").CategoryId;
+
                                 db.Questions.Add(question);
                                 
                                 // Update the UI counter by refreshing the list
@@ -111,7 +114,7 @@ namespace QuizGame.Application.UI
                                 });
                             }
                             
-                            db.SaveChangesAsync();
+                            db.SaveChanges();
                             
                             // Show success message
                             System.Windows.Application.Current.Dispatcher.Invoke(() => {
