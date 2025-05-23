@@ -12,7 +12,7 @@ namespace QuizGame.API
         private string content = "";
 
 
-        public Response(HttpResponseMessage? response)
+        public Response(HttpResponseMessage response)
         {
             readResponse(response);
             JObject jsonObject = JObject.Parse(this.content);
@@ -26,8 +26,6 @@ namespace QuizGame.API
             {
                 this.content = "";
             }
-
-            new Parser(this.content).parse();
         }
 
         protected async void readResponse(HttpResponseMessage? response)

@@ -1,6 +1,6 @@
 using System;
 
-namespace application.Models;
+namespace QuizGame.Application.Model;
 
 /// <summary>
 /// Represents a quiz session for tracking user results.

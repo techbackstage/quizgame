@@ -1,7 +1,7 @@
 using System.Windows.Controls;
 using System.Windows;
 
-namespace application
+namespace QuizGame.Application.UI
 {
     public partial class Window1Control : UserControl
     {

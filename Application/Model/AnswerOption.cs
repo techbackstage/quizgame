@@ -1,4 +1,4 @@
-namespace application.Models;
+namespace QuizGame.Application.Model;
 
 /// <summary>
 /// Represents an answer option for a quiz question.

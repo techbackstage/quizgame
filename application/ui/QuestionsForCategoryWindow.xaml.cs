@@ -2,10 +2,10 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
-using application.Data;
-using application.Models;
+using QuizGame.Application.Database;
+using QuizGame.Application.Model;
 
-namespace application
+namespace QuizGame.Application.UI
 {
     public partial class QuestionsForCategoryWindow : Window
     {

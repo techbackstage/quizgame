@@ -3,12 +3,12 @@ using System;
 using System.Windows;
 using System.IO;
 
-namespace application
+namespace QuizGame.Application
 {
     /// <summary>
     /// The main application class. Handles startup and global exception handling.
     /// </summary>
-    public partial class App : Application
+    public partial class App : System.Windows.Application
     {
         public App()
         {
