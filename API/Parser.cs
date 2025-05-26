@@ -23,32 +23,26 @@ namespace QuizGame.API
         protected List<Question> ParseQuestionsAndAnswers(string input)
         {
             var questions = new List<Question>();
+            const string answerSeparator = "~|~";
+            const string correctAnswerPrefix = "[CORRECT]";
 
             try
             {
-                // Split the input into question blocks using the separator #?#
                 var questionBlocks = input.Split(new string[] { "#?#" }, StringSplitOptions.RemoveEmptyEntries);
 
                 foreach (var block in questionBlocks)
                 {
                     if (string.IsNullOrWhiteSpace(block)) continue;
 
-                    // Split each block into question part and answers part using #*#
                     var parts = block.Split(new string[] { "#*#" }, StringSplitOptions.RemoveEmptyEntries);
-                    
                     if (parts.Length < 2) continue;
 
                     var questionText = parts[0].Trim();
-                    var answersText = parts[1];
+                    var answersText = parts[1].Trim(); // Trim the whole answers string once
 
                     var answers = new List<AnswerOption>();
+                    var answerParts = answersText.Split(new string[] { answerSeparator }, StringSplitOptions.None); // Don't remove empty entries yet, handle after trim
 
-                    // Parse answers - split by #-# for wrong answers and #+# for correct answers
-                    var answerParts = answersText.Split(new string[] { "#-#", "#+#" }, StringSplitOptions.RemoveEmptyEntries);
-                    
-                    // Find correct answer markers
-                    var correctAnswerMatches = Regex.Matches(answersText, @"#+#(.*?)#+#");
-                    
                     foreach (var answerPart in answerParts)
                     {
                         var answerText = answerPart.Trim();
@@ -56,15 +50,15 @@ namespace QuizGame.API
 
                         bool isCorrect = false;
                         
-                        // Check if this answer is marked as correct
-                        foreach (Match match in correctAnswerMatches)
+                        if (answerText.StartsWith(correctAnswerPrefix, StringComparison.OrdinalIgnoreCase))
                         {
-                            if (match.Groups[1].Value.Trim().Equals(answerText, StringComparison.OrdinalIgnoreCase))
-                            {
-                                isCorrect = true;
-                                break;
-                            }
+                            isCorrect = true;
+                            // Remove the prefix to get the actual answer text
+                            answerText = answerText.Substring(correctAnswerPrefix.Length).Trim();
                         }
+
+                        // Ensure answerText is not empty after potentially removing prefix
+                        if (string.IsNullOrWhiteSpace(answerText)) continue;
 
                         answers.Add(new AnswerOption
                         {
@@ -73,13 +67,21 @@ namespace QuizGame.API
                         });
                     }
 
-                    // Only add questions that have at least one answer
-                    if (answers.Count > 0)
+                    if (answers.Count > 0) // Ensure there are answers, ideally 4, but at least 1
                     {
+                        // Optional: Add validation here to ensure exactly one answer is marked correct if required by your logic
+                        /*
+                        if (answers.Count(a => a.IsCorrect) != 1 && answers.Any()) 
+                        {
+                            Console.WriteLine($"Warning: Question '{questionText}' does not have exactly one correct answer. Proceeding, but this might be an issue.");
+                            // Depending on requirements, you might skip this question or try to fix it
+                        }
+                        */
                         questions.Add(new Question
                         {
                             Text = questionText,
                             AnswerOptions = answers
+                            // DifficultyLevel and CategoryId would need to be parsed if present in 'block'
                         });
                     }
                 }
@@ -87,6 +89,7 @@ namespace QuizGame.API
             catch (Exception ex)
             {
                 Console.WriteLine($"Error parsing questions: {ex.Message}");
+                // Potentially log to a file or re-throw if critical
             }
 
             return questions;

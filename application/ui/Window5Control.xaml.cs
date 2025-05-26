@@ -6,6 +6,7 @@ using System.Windows.Media;
 using QuizGame.Application.Database;
 using QuizGame.Application.Model;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace QuizGame.Application.UI
 {
@@ -53,6 +54,9 @@ namespace QuizGame.Application.UI
                     MessageBox.Show("Quiz beendet!", "Ende", MessageBoxButton.OK, MessageBoxImage.Information);
                     return;
                 }
+                
+                // Reset button colors to default
+                ResetAllButtonStyles();
                 
                 // Update progress text
                 QuestionProgressTextBlock.Text = $"Frage {_questionCounter} von {TotalQuestions}";
@@ -138,74 +142,73 @@ namespace QuizGame.Application.UI
             return category;
         }
         
-        private void AnswerButton_Click(object sender, System.Windows.RoutedEventArgs e)
+        private async void AnswerButton_Click(object sender, RoutedEventArgs e)
         {
-            // Disable all buttons to prevent multiple answers
-            AnswerButton1.IsEnabled = AnswerButton2.IsEnabled = 
-            AnswerButton3.IsEnabled = AnswerButton4.IsEnabled = false;
-            
-            var button = sender as Button;
-            bool isCorrect = button != null && button.Tag != null && (bool)button.Tag;
-            
-            // Highlight all buttons according to correctness
-            HighlightButtons();
-            
-            // Highlight the clicked button
-            if (button != null)
+            AnswerButton1.IsEnabled = false;
+            AnswerButton2.IsEnabled = false;
+            AnswerButton3.IsEnabled = false;
+            AnswerButton4.IsEnabled = false;
+
+            var correctBrush = Brushes.Green;
+            var correctBorderBrush = Brushes.DarkGreen; // Darker green for border
+            var correctForegroundBrush = Brushes.White;
+
+            var defaultBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#23232b"));
+            var defaultBorderBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#262631"));
+            var defaultForegroundBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#bfc1ce"));
+
+            Button[] answerButtons = { AnswerButton1, AnswerButton2, AnswerButton3, AnswerButton4 };
+
+            foreach (Button btn in answerButtons)
             {
-                if (isCorrect)
+                bool isButtonCorrect = btn.Tag is bool bVal && bVal; // Evaluate for debug and logic
+                
+                if (isButtonCorrect) // Use the pre-evaluated boolean
                 {
-                    button.Background = System.Windows.Media.Brushes.Green;
-                    button.Foreground = System.Windows.Media.Brushes.White;
+                    btn.Background = correctBrush;
+                    btn.BorderBrush = correctBorderBrush;
+                    btn.Foreground = correctForegroundBrush;
                 }
                 else
                 {
-                    button.Background = System.Windows.Media.Brushes.Red;
-                    button.Foreground = System.Windows.Media.Brushes.White;
+                    btn.Background = defaultBrush;
+                    btn.BorderBrush = defaultBorderBrush;
+                    btn.Foreground = defaultForegroundBrush;
                 }
             }
-            
-            // Load next question after delay
-            var timer = new System.Windows.Threading.DispatcherTimer();
-            timer.Interval = TimeSpan.FromSeconds(2);
-            timer.Tick += (s, args) => 
+
+            await System.Threading.Tasks.Task.Delay(2000);
+
+            LoadQuestion();
+
+            if (_questionCounter <= TotalQuestions)
             {
-                timer.Stop();
-                LoadQuestion();
-                
-                // Re-enable all buttons
-                AnswerButton1.IsEnabled = AnswerButton2.IsEnabled = 
-                AnswerButton3.IsEnabled = AnswerButton4.IsEnabled = true;
-            };
-            timer.Start();
-        }
-        
-        private void HighlightButtons()
-        {
-            // Reset all buttons to default
-            ResetButtonStyle(AnswerButton1);
-            ResetButtonStyle(AnswerButton2);
-            ResetButtonStyle(AnswerButton3);
-            ResetButtonStyle(AnswerButton4);
-            
-            // Highlight correct answers
-            if (AnswerButton1.Tag != null && (bool)AnswerButton1.Tag)
-                AnswerButton1.Background = System.Windows.Media.Brushes.Green;
-                
-            if (AnswerButton2.Tag != null && (bool)AnswerButton2.Tag)
-                AnswerButton2.Background = System.Windows.Media.Brushes.Green;
-                
-            if (AnswerButton3.Tag != null && (bool)AnswerButton3.Tag)
-                AnswerButton3.Background = System.Windows.Media.Brushes.Green;
-                
-            if (AnswerButton4.Tag != null && (bool)AnswerButton4.Tag)
-                AnswerButton4.Background = System.Windows.Media.Brushes.Green;
+                AnswerButton1.IsEnabled = true;
+                AnswerButton2.IsEnabled = true;
+                AnswerButton3.IsEnabled = true;
+                AnswerButton4.IsEnabled = true;
+                // Reset styles for next question explicitly here if not done in LoadQuestion
+                // ResetAllButtonStyles(); // Consider if this is needed here or in LoadQuestion
+            }
         }
         
         private void ResetButtonStyle(Button button)
         {
-            button.Background = (System.Windows.Media.Brush)new System.Windows.Media.BrushConverter().ConvertFrom("#23232b");
-            button.Foreground = (System.Windows.Media.Brush)new System.Windows.Media.BrushConverter().ConvertFrom("#bfc1ce");
+            // Reset only the dynamically changed properties to their default visual state.
+            // These values should match the initial state defined in XAML (either in Style or direct attributes).
+            button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#23232b"));
+            button.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#bfc1ce"));
+            button.BorderBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#262631"));
+            // Do NOT clear the style, set BorderThickness, or call UpdateLayout(), 
+            // as these can interfere with the XAML-defined style and layout.
+        }
+        
+        private void ResetAllButtonStyles()
+        {
+            ResetButtonStyle(AnswerButton1);
+            ResetButtonStyle(AnswerButton2);
+            ResetButtonStyle(AnswerButton3);
+            ResetButtonStyle(AnswerButton4);
         }
     }
 }
