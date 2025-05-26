@@ -91,13 +91,13 @@ namespace QuizGame.Application.UI
                     // Save questions to database
                     using (var db = QuizDbContext.getContext())
                     {
-                        var questions = ApiController.Run("Schule");
+                        var questions = ApiController.Run(category.Name);
                     
                         if (questions.Count > 0)
                         {
                             foreach (var question in questions)
                             {
-                                question.CategoryId = db.Categories.First(category => category.Name == "Schule").CategoryId;
+                                question.CategoryId = category.CategoryId;
 
                                 db.Questions.Add(question);
                                 
@@ -134,7 +134,7 @@ namespace QuizGame.Application.UI
                         else
                         {
                             System.Windows.Application.Current.Dispatcher.Invoke(() => {
-                                MessageBox.Show("Keine Fragen generiert. Bitte versuchen Sie es erneut.", 
+                                MessageBox.Show("Keine Fragen generiert. Möglicherweise ist die API nicht verfügbar oder die Antwort konnte nicht geparst werden. Bitte versuchen Sie es erneut.", 
                                     "Fehler", MessageBoxButton.OK, MessageBoxImage.Warning);
                             });
                         }

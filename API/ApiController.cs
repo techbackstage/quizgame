@@ -11,7 +11,7 @@ namespace QuizGame.API
 
 		public static List<Question> Run(string category)
 		{
-			return new Request().Call("Gib mir 10 Fragen mit 4 Antwortoptionen zur Kategorie " + category + " wovon nur eine richtig sein soll. Trenne Fragen mit #?#, die Frage von den Antworten mit '#*#' und die einzelnen Antworten mit '#-#' au�er debi der richtigen antwort da verwende #+#, die trennzeichen sollen links und rechts vom Inhalt stehen.");
+			return new Request().Call("Gib mir 10 Fragen mit 4 Antwortoptionen zur Kategorie " + category + " wovon nur eine richtig sein soll. Trenne Fragen mit #?#, die Frage von den Antworten mit '#*#' und die einzelnen Antworten mit '#-#' außer bei der richtigen Antwort da verwende #+#, die Trennzeichen sollen links und rechts vom Inhalt stehen.");
 		}
 
 	}
