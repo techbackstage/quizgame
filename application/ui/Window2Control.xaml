@@ -5,6 +5,21 @@
     <Grid Background="#232533">
         <Border Background="#191A23" CornerRadius="16" Margin="16" VerticalAlignment="Center" HorizontalAlignment="Center">
             <StackPanel Margin="32,24" VerticalAlignment="Center" HorizontalAlignment="Stretch">
+                <!-- Back Button -->
+                <Button x:Name="BackButton" Width="120" Height="36" FontSize="16" FontWeight="SemiBold" 
+                        Background="#6C757D" Foreground="#E6E8F0" BorderThickness="0" 
+                        Margin="0,0,0,16" HorizontalAlignment="Left">
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                        <TextBlock Text="← Zurück" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Border Background="{TemplateBinding Background}" CornerRadius="8">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
                 <TextBlock Text="Kategorien" Foreground="#E6E8F0" FontSize="32" FontWeight="Bold" Margin="0,0,0,24"/>
                 <!-- ItemsControl for dynamic categories -->
                 <ItemsControl x:Name="CategoryListPanel" ItemsSource="{Binding Categories}">

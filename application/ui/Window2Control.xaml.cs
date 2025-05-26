@@ -20,6 +20,9 @@ namespace QuizGame.Application.UI
         public ICommand ShowQuestionsCommand { get; }
         public ICommand GenerateQuestionsCommand { get; }
 
+        // Event for back button
+        public event EventHandler BackButtonClicked;
+
         public Window2Control()
         {
             InitializeComponent();
@@ -29,6 +32,7 @@ namespace QuizGame.Application.UI
             GenerateQuestionsCommand = new RelayCommand(GenerateQuestions);
             LoadCategories();
             AddCategoryButton.Click += AddCategoryButton_Click;
+            BackButton.Click += BackButton_Click;
         }
 
         private void LoadCategories()
@@ -151,9 +155,14 @@ namespace QuizGame.Application.UI
         private void AddCategoryButton_Click(object sender, RoutedEventArgs e)
         {
             var addCat = new Window3Control();
-            var win = new Window { Content = addCat, Width = 400, Height = 250, WindowStartupLocation = WindowStartupLocation.CenterScreen, Title = "Kategorie hinzufügen" };
+            var win = new Window { Content = addCat, Width = 500, Height = 350, WindowStartupLocation = WindowStartupLocation.CenterScreen, Title = "Kategorie hinzufügen" };
             win.ShowDialog();
             LoadCategories();
+        }
+
+        private void BackButton_Click(object sender, RoutedEventArgs e)
+        {
+            BackButtonClicked?.Invoke(this, EventArgs.Empty);
         }
     }
     // Simple RelayCommand implementation

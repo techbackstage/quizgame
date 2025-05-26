@@ -41,6 +41,7 @@ namespace QuizGame.Application
         private void ShowKategorien()
         {
             var kategorien = new Window2Control();
+            kategorien.BackButtonClicked += (s, e) => ShowHome();
             // Add handler for "Frage hinzufügen" button if needed
             MainContent.Content = kategorien;
         }
