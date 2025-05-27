@@ -7,7 +7,14 @@
 		<Nullable>enable</Nullable>
 		<UseWPF>true</UseWPF>
 		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+		<ApplicationIcon>quiz.ico</ApplicationIcon>
 	</PropertyGroup>
+
+	<ItemGroup>
+		<Content Include=".\quiz.ico">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
 
 	<ItemGroup>
 		<None Include=".\config.json">
