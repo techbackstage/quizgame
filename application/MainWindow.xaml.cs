@@ -29,7 +29,7 @@ namespace QuizGame.Application
             }
         }
 
-        private void ShowHome()
+        public void ShowHome()
         {
             var home = new Window1Control();
             home.QuizStartenButton.Click += (s, e) => ShowQuizStart();
@@ -64,6 +64,12 @@ namespace QuizGame.Application
         {
             var quizLayout = new Window5Control(selectedCategory);
             MainContent.Content = quizLayout;
+        }
+
+        public void ShowScoreDisplay(QuizSession session)
+        {
+            var scoreDisplay = new ScoreDisplayControl(session);
+            MainContent.Content = scoreDisplay;
         }
     }
 }

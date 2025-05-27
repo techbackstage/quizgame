@@ -14,22 +14,16 @@ namespace QuizGame.Application.UI
     {
         private readonly Category? _selectedCategory;
         private int _questionCounter = 0;
+        private int _currentScore = 0;
         private const int TotalQuestions = 10;
+        private QuizSession _currentQuizSession = new QuizSession { Date = DateTime.Now };
         
-        public Window5Control()
+        public Window5Control() : this(null)
         {
-            InitializeComponent();
-            
-            // Add event handlers for answer buttons
-            AnswerButton1.Click += AnswerButton_Click;
-            AnswerButton2.Click += AnswerButton_Click;
-            AnswerButton3.Click += AnswerButton_Click;
-            AnswerButton4.Click += AnswerButton_Click;
-            
-            LoadQuestion();
+            // Common initialization can go here if needed, or leave empty if all is in the other constructor
         }
         
-        public Window5Control(Category selectedCategory)
+        public Window5Control(Category? selectedCategory)
         {
             InitializeComponent();
             _selectedCategory = selectedCategory;
@@ -51,7 +45,7 @@ namespace QuizGame.Application.UI
                 if (_questionCounter > TotalQuestions)
                 {
                     // End of quiz reached
-                    MessageBox.Show("Quiz beendet!", "Ende", MessageBoxButton.OK, MessageBoxImage.Information);
+                    EndQuiz();
                     return;
                 }
                 
@@ -149,6 +143,16 @@ namespace QuizGame.Application.UI
             AnswerButton3.IsEnabled = false;
             AnswerButton4.IsEnabled = false;
 
+            var clickedButton = sender as Button;
+            if (clickedButton == null) return;
+
+            bool answerIsCorrect = clickedButton.Tag is bool bVal && bVal;
+
+            if (answerIsCorrect)
+            {
+                _currentScore++;
+            }
+
             var correctBrush = Brushes.Green;
             var correctBorderBrush = Brushes.DarkGreen; // Darker green for border
             var correctForegroundBrush = Brushes.White;
@@ -161,7 +165,7 @@ namespace QuizGame.Application.UI
 
             foreach (Button btn in answerButtons)
             {
-                bool isButtonCorrect = btn.Tag is bool bVal && bVal; // Evaluate for debug and logic
+                bool isButtonCorrect = btn.Tag is bool currentButtonIsCorrect && currentButtonIsCorrect;
                 
                 if (isButtonCorrect) // Use the pre-evaluated boolean
                 {
@@ -209,6 +213,29 @@ namespace QuizGame.Application.UI
             ResetButtonStyle(AnswerButton2);
             ResetButtonStyle(AnswerButton3);
             ResetButtonStyle(AnswerButton4);
+        }
+
+        private void EndQuiz()
+        {
+            _currentQuizSession.Score = _currentScore;
+            // _currentQuizSession.CompletionTime = ... // Can be added later
+
+            using (var db = QuizDbContext.getContext())
+            {
+                db.QuizSessions.Add(_currentQuizSession);
+                db.SaveChanges();
+            }
+
+            var mainWindow = Window.GetWindow(this) as MainWindow;
+            if (mainWindow != null)
+            {
+                mainWindow.ShowScoreDisplay(_currentQuizSession); // Navigate to score display
+            }
+            else
+            {
+                // Fallback if cast fails or window is not found
+                MessageBox.Show($"Quiz beendet! Deine Punktzahl: {_currentScore}/{TotalQuestions}", "Quiz Ende", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
         }
     }
 }
