@@ -30,7 +30,7 @@ public class QuizDbContext : DbContext
         base.OnModelCreating(modelBuilder);
 
         modelBuilder.Entity<Question>()
-            .HasMany(q => q.AnswerOptions)
+            .HasMany(q => q.Answers)
             .WithOne(a => a.Question)
             .HasForeignKey(a => a.QuestionId)
             .OnDelete(DeleteBehavior.Cascade);

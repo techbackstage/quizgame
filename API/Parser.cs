@@ -80,7 +80,7 @@ namespace QuizGame.API
                         questions.Add(new Question
                         {
                             Text = questionText,
-                            AnswerOptions = answers
+                            Answers = answers
                             // DifficultyLevel and CategoryId would need to be parsed if present in 'block'
                         });
                     }

@@ -58,7 +58,7 @@ namespace QuizGame.Application.UI
                 using (var db = QuizDbContext.getContext())
                 {
                     // Get a random question from the selected category if provided
-                    var questionQuery = db.Questions.Include(q => q.AnswerOptions).AsQueryable();
+                    var questionQuery = db.Questions.Include(q => q.Answers).AsQueryable();
                     
                     if (_selectedCategory != null)
                     {
@@ -81,7 +81,7 @@ namespace QuizGame.Application.UI
                             Text = $"Beispielfrage für {category.Name}?",
                             DifficultyLevel = 1,
                             CategoryId = category.CategoryId,
-                            AnswerOptions = new System.Collections.Generic.List<AnswerOption>
+                            Answers = new System.Collections.Generic.List<AnswerOption>
                             {
                                 new AnswerOption { Text = "Antwort 1", IsCorrect = false },
                                 new AnswerOption { Text = "Antwort 2", IsCorrect = false },
@@ -94,15 +94,15 @@ namespace QuizGame.Application.UI
 
                         // Reload with answer options
                         question = db.Questions
-                            .Include(q => q.AnswerOptions)
+                            .Include(q => q.Answers)
                             .Where(q => q.QuestionId == newQuestion.QuestionId)
                             .FirstOrDefault();
                     }
 
                     // Defensive: check for nulls
-                    if (question != null && question.AnswerOptions != null)
+                    if (question != null && question.Answers != null)
                     {
-                        var answers = question.AnswerOptions.OrderBy(a => Guid.NewGuid()).ToList(); // Randomize answers
+                        var answers = question.Answers.OrderBy(a => Guid.NewGuid()).ToList(); // Randomize answers
                         QuestionTextBlock.Text = question.Text;
                         AnswerButton1.Content = (answers.Count > 0) ? answers[0].Text : "";
                         AnswerButton2.Content = (answers.Count > 1) ? answers[1].Text : "";
