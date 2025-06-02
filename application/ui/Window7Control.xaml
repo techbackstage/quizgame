@@ -6,25 +6,29 @@
         <Border Background="#23232b" CornerRadius="16" Padding="0" Margin="12,12,12,12" BorderBrush="#262631" BorderThickness="2">
             <StackPanel>
                 <!-- Title -->
-                <Border Background="#23232b" Padding="0,18,0,16" CornerRadius="16,16,0,0">
-                    <TextBlock Text="Statistik" FontSize="24" FontWeight="Bold" Foreground="#f3f3f7" HorizontalAlignment="Left" Margin="8,0,0,0"/>
-                </Border>
+                <Grid Margin="8,0,8,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Statistik" FontSize="24" FontWeight="Bold" Foreground="#f3f3f7" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0,18,0,16" Grid.Column="0"/>
+                    <Button x:Name="BackButton" Content="Zurück" VerticalAlignment="Center" HorizontalAlignment="Right" Click="BackButton_Click" Padding="10,5" MinWidth="75" Grid.Column="1"/>
+                </Grid>
                 <!-- Verlauf der Spielergebnisse -->
                 <TextBlock Text="Verlauf der Spielergebnisse" FontSize="15" Foreground="#7e8193" Margin="16,0,0,0"/>
-                <!-- Simple Line Chart Placeholder -->
-                <Border Background="#23232b" Margin="16,8,16,0" Height="56" CornerRadius="8" BorderBrush="#262631" BorderThickness="1">
-                    <Canvas>
-                        <!-- Simulated line chart with Polyline -->
-                        <Polyline Points="8,40 28,28 48,36 68,24 88,32 108,28 128,36 148,20" Stroke="#4e7cff" StrokeThickness="2"/>
+                <!-- Actual Graph Area -->
+                <Border Background="#2c2c3a" Margin="16,8,16,0" Height="200" CornerRadius="8" BorderBrush="#262631" BorderThickness="1">
+                    <Canvas x:Name="ScoreHistoryCanvas" ClipToBounds="True">
+                        <!-- Graph will be drawn here by code-behind -->
                     </Canvas>
                 </Border>
                 <!-- Durchschnittliche Winstatistik -->
-                <StackPanel Orientation="Horizontal" Margin="16,12,16,0" VerticalAlignment="Center">
+                <StackPanel Orientation="Horizontal" Margin="16,12,16,16" VerticalAlignment="Center">
                     <TextBlock Text="Durchschnittliche" FontSize="15" Foreground="#7e8193"/>
                     <TextBlock Text=" " Width="8"/>
                     <TextBlock Text="Winstatistik" FontSize="15" Foreground="#7e8193"/>
                     <TextBlock Text=" " Width="16"/>
-                    <TextBlock Text="7,5" FontSize="15" Foreground="#bfc1ce" HorizontalAlignment="Right"/>
+                    <TextBlock x:Name="AverageScoreTextBlock" Text="-" FontSize="15" Foreground="#bfc1ce" HorizontalAlignment="Right"/>
                 </StackPanel>
             </StackPanel>
         </Border>

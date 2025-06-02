@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace QuizGame.Application.Model;
 
@@ -16,4 +17,8 @@ public class Category
     // Add date tracking properties
     public DateTime CreatedAt { get; set; } = DateTime.Now;
     public DateTime? UpdatedAt { get; set; }
+
+    // Property for PDF export selection
+    [NotMapped] // This property is not stored in the database
+    public bool IsSelectedForExport { get; set; }
 }

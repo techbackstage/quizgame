@@ -1,0 +1,17 @@
+<UserControl x:Class="QuizGame.Application.UI.ScoreDisplayControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:QuizGame.Application.UI"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid Background="#1e1e2f">
+        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+            <TextBlock Text="Quiz Ergebnis" FontSize="36" FontWeight="Bold" Foreground="#eff1f5" HorizontalAlignment="Center" Margin="0,0,0,30"/>
+            <TextBlock x:Name="ScoreTextBlock" FontSize="28" Foreground="#eff1f5" HorizontalAlignment="Center" Margin="0,0,0,10"/>
+            <TextBlock x:Name="DateTextBlock" FontSize="20" Foreground="#b8bac6" HorizontalAlignment="Center" Margin="0,0,0,30"/>
+            <Button x:Name="BackButton" Content="Zurück zum Hauptmenü" Width="250" Height="50" Click="BackButton_Click"/>
+        </StackPanel>
+    </Grid>
+</UserControl> 

@@ -27,5 +27,11 @@ namespace QuizGame.Application
             // Mark as handled to prevent app crash
             e.Handled = true;
         }
+
+        protected override void OnStartup(StartupEventArgs e)
+        {
+            base.OnStartup(e);
+            PdfSharp.Fonts.GlobalFontSettings.UseWindowsFontsUnderWindows = true;
+        }
     }
 }

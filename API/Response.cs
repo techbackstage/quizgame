@@ -14,25 +14,47 @@ namespace QuizGame.API
 
         public Response(HttpResponseMessage response)
         {
-            readResponse(response);
-            JObject jsonObject = JObject.Parse(this.content);
+            readResponseSync(response);
             
-            var contentToken = jsonObject["choices"]?[0]?["message"]?["content"];
-            if (contentToken != null)
+            try
             {
-                this.content = contentToken.ToString();
+                if (string.IsNullOrWhiteSpace(this.content))
+                {
+                    Console.WriteLine("Empty response content");
+                    this.content = "";
+                    return;
+                }
+
+                // Log the raw response for debugging
+                Console.WriteLine($"Raw API Response: {this.content}");
+                
+                JObject jsonObject = JObject.Parse(this.content);
+                
+                var contentToken = jsonObject["choices"]?[0]?["message"]?["content"];
+                if (contentToken != null)
+                {
+                    this.content = contentToken.ToString();
+                    Console.WriteLine($"Extracted content: {this.content}");
+                }
+                else
+                {
+                    Console.WriteLine("No content token found in response");
+                    this.content = "";
+                }
             }
-            else
+            catch (Exception ex)
             {
+                Console.WriteLine($"Error parsing JSON response: {ex.Message}");
+                Console.WriteLine($"Raw content: {this.content}");
                 this.content = "";
             }
         }
 
-        protected async void readResponse(HttpResponseMessage? response)
+        protected void readResponseSync(HttpResponseMessage? response)
         {
             if (response != null)
             {
-                this.content = await response.Content.ReadAsStringAsync();
+                this.content = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
             }
         }
 

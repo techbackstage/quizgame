@@ -23,53 +23,76 @@ namespace QuizGame.API
         protected List<Question> ParseQuestionsAndAnswers(string input)
         {
             var questions = new List<Question>();
+            const string answerSeparator = "~|~";
+            const string correctAnswerPrefix = "[CORRECT]";
 
-        // Regex zum Extrahieren der Fragen (zwischen #?# und #*#) und Antworten (zwischen #-# und +# für die richtige Antwort)
-        var questionRegex = new Regex(@"#\?#(.*?)#\*#", RegexOptions.Singleline);
-        var answerRegex = new Regex(@"#-#(.*?)#-#", RegexOptions.Singleline);
-        var correctAnswerRegex = new Regex(@"\+#(.*?)#-#", RegexOptions.Singleline);
-
-        // Frage-Extraktion
-        var questionMatches = questionRegex.Matches(input);
-        
-        foreach (Match questionMatch in questionMatches)
-        {
-            var questionText = questionMatch.Groups[1].Value.Trim();
-
-            // Antwort-Extraktion
-            var answerMatches = answerRegex.Matches(input);
-
-            var answers = new List<AnswerOption>();
-            bool correctAnswerFound = false;
-
-            foreach (Match answerMatch in answerMatches)
+            try
             {
-                var answerText = answerMatch.Groups[1].Value.Trim();
-                bool isCorrect = false;
+                var questionBlocks = input.Split(new string[] { "#?#" }, StringSplitOptions.RemoveEmptyEntries);
 
-                // Prüfen, ob die Antwort korrekt ist
-                if (!correctAnswerFound && correctAnswerRegex.IsMatch(answerMatch.Value))
+                foreach (var block in questionBlocks)
                 {
-                    isCorrect = true;
-                    correctAnswerFound = true;
+                    if (string.IsNullOrWhiteSpace(block)) continue;
+
+                    var parts = block.Split(new string[] { "#*#" }, StringSplitOptions.RemoveEmptyEntries);
+                    if (parts.Length < 2) continue;
+
+                    var questionText = parts[0].Trim();
+                    var answersText = parts[1].Trim(); // Trim the whole answers string once
+
+                    var answers = new List<AnswerOption>();
+                    var answerParts = answersText.Split(new string[] { answerSeparator }, StringSplitOptions.None); // Don't remove empty entries yet, handle after trim
+
+                    foreach (var answerPart in answerParts)
+                    {
+                        var answerText = answerPart.Trim();
+                        if (string.IsNullOrWhiteSpace(answerText)) continue;
+
+                        bool isCorrect = false;
+                        
+                        if (answerText.StartsWith(correctAnswerPrefix, StringComparison.OrdinalIgnoreCase))
+                        {
+                            isCorrect = true;
+                            // Remove the prefix to get the actual answer text
+                            answerText = answerText.Substring(correctAnswerPrefix.Length).Trim();
+                        }
+
+                        // Ensure answerText is not empty after potentially removing prefix
+                        if (string.IsNullOrWhiteSpace(answerText)) continue;
+
+                        answers.Add(new AnswerOption
+                        {
+                            Text = answerText,
+                            IsCorrect = isCorrect
+                        });
+                    }
+
+                    if (answers.Count > 0) // Ensure there are answers, ideally 4, but at least 1
+                    {
+                        // Optional: Add validation here to ensure exactly one answer is marked correct if required by your logic
+                        /*
+                        if (answers.Count(a => a.IsCorrect) != 1 && answers.Any()) 
+                        {
+                            Console.WriteLine($"Warning: Question '{questionText}' does not have exactly one correct answer. Proceeding, but this might be an issue.");
+                            // Depending on requirements, you might skip this question or try to fix it
+                        }
+                        */
+                        questions.Add(new Question
+                        {
+                            Text = questionText,
+                            Answers = answers
+                            // DifficultyLevel and CategoryId would need to be parsed if present in 'block'
+                        });
+                    }
                 }
-
-                answers.Add(new AnswerOption
-                {
-                    Text = answerText.Replace("#+#", ""),
-                    IsCorrect = isCorrect
-                });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error parsing questions: {ex.Message}");
+                // Potentially log to a file or re-throw if critical
             }
 
-            // Eine neue Frage mit den Antworten erstellen
-            questions.Add(new Question
-            {
-                Text = questionText,
-                AnswerOptions = answers
-            });
-        }
-
-        return questions;
+            return questions;
         }
     }
 }
