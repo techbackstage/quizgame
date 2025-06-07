@@ -5,6 +5,7 @@ using System.Windows.Input;
 using QuizGame.Application.Database;
 using QuizGame.Application.Model;
 using Microsoft.EntityFrameworkCore; // Füge diese Zeile hinzu
+using QuizGame.Application.Common;
 
 namespace QuizGame.Application.UI
 {
@@ -38,7 +39,7 @@ namespace QuizGame.Application.UI
             QuestionsList.ItemsSource = Questions;
         }
 
-        private void DeleteQuestion(object parameter)
+        private void DeleteQuestion(object? parameter)
         {
             if (parameter is Question q)
             {
@@ -59,7 +60,7 @@ namespace QuizGame.Application.UI
             }
         }
 
-        private void EditQuestion(object parameter)
+        private void EditQuestion(object? parameter)
         {
             if (parameter is Question question)
             {

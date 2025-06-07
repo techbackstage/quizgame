@@ -96,9 +96,10 @@ namespace QuizGame.Application.UI
                 TextAlignment = TextAlignment.Center,
                 VerticalAlignment = VerticalAlignment.Center
             };
-            var textSize = new Size(textBlock.ActualWidth, textBlock.ActualHeight);
-            Canvas.SetLeft(textBlock, center.X - textSize.Width / 2 - 15);
-            Canvas.SetTop(textBlock, center.Y - textSize.Height / 2 - 15);
+            textBlock.Measure(new Size(Double.PositiveInfinity, Double.PositiveInfinity));
+            Size textSize = textBlock.DesiredSize;
+            Canvas.SetLeft(textBlock, center.X - textSize.Width / 2);
+            Canvas.SetTop(textBlock, center.Y - textSize.Height / 2);
             WinRateCanvas.Children.Add(textBlock);
         }
         
@@ -120,8 +121,6 @@ namespace QuizGame.Application.UI
         private void DrawCategoryPerformanceChart(List<QuizSession> sessions)
         {
             CategoryPerformanceCanvas.Children.Clear();
-            if (!sessions.Any()) return;
-
             var categoryPerformance = sessions
                 .Where(s => s.Category != null)
                 .GroupBy(s => s.Category!.Name)
@@ -133,6 +132,8 @@ namespace QuizGame.Application.UI
                 .OrderByDescending(x => x.AverageScore)
                 .Take(5)
                 .ToList();
+
+            if (!categoryPerformance.Any()) return;
 
             double canvasHeight = CategoryPerformanceCanvas.ActualHeight > 0 ? CategoryPerformanceCanvas.ActualHeight : 150;
             double canvasWidth = CategoryPerformanceCanvas.ActualWidth > 0 ? CategoryPerformanceCanvas.ActualWidth : 350;
@@ -175,9 +176,9 @@ namespace QuizGame.Application.UI
         private void DrawProgressChart(List<QuizSession> sessions)
         {
             ProgressCanvas.Children.Clear();
-            if (sessions.Count < 2) return;
-
             var orderedSessions = sessions.OrderBy(s => s.Date).ToList();
+            if (orderedSessions.Count < 2) return;
+
             double canvasHeight = ProgressCanvas.ActualHeight > 0 ? ProgressCanvas.ActualHeight : 200;
             double canvasWidth = ProgressCanvas.ActualWidth > 0 ? ProgressCanvas.ActualWidth : 750;
 

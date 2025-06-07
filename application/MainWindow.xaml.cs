@@ -60,7 +60,7 @@ namespace QuizGame.Application
             MainContent.Content = quiz;
         }
 
-        private void ShowQuizLayout(Category selectedCategory)
+        private void ShowQuizLayout(Category? selectedCategory)
         {
             var quizLayout = new Window5Control(selectedCategory);
             MainContent.Content = quizLayout;
