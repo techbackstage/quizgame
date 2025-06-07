@@ -20,7 +20,7 @@ namespace QuizGame.Application.UI
         {
             if (_session != null)
             {
-                ScoreTextBlock.Text = $"Deine Punktzahl: {_session.Score} / 10"; // Assuming 10 questions total
+                ScoreTextBlock.Text = $"Deine Punktzahl: {_session.Score} / {_session.TotalQuestions}";
                 DateTextBlock.Text = $"Datum: {_session.Date:dd.MM.yyyy HH:mm}";
             }
             else

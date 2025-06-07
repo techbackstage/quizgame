@@ -9,6 +9,9 @@ public class QuizSession
 {
     public int QuizSessionId { get; set; }
     public int Score { get; set; }
+    public int TotalQuestions { get; set; }
     public TimeSpan CompletionTime { get; set; }
     public DateTime Date { get; set; }
+    public int? CategoryId { get; set; }
+    public virtual Category? Category { get; set; }
 }

@@ -7,6 +7,7 @@ using QuizGame.Application.Database;
 using QuizGame.Application.Model;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace QuizGame.Application.UI
 {
@@ -17,6 +18,7 @@ namespace QuizGame.Application.UI
         private int _currentScore = 0;
         private const int TotalQuestions = 10;
         private QuizSession _currentQuizSession = new QuizSession { Date = DateTime.Now };
+        private readonly Stopwatch _stopwatch = new Stopwatch();
         
         public Window5Control() : this(null)
         {
@@ -34,6 +36,7 @@ namespace QuizGame.Application.UI
             AnswerButton3.Click += AnswerButton_Click;
             AnswerButton4.Click += AnswerButton_Click;
             
+            _stopwatch.Start();
             LoadQuestion();
         }
 
@@ -217,8 +220,11 @@ namespace QuizGame.Application.UI
 
         private void EndQuiz()
         {
+            _stopwatch.Stop();
             _currentQuizSession.Score = _currentScore;
-            // _currentQuizSession.CompletionTime = ... // Can be added later
+            _currentQuizSession.TotalQuestions = TotalQuestions;
+            _currentQuizSession.CompletionTime = _stopwatch.Elapsed;
+            _currentQuizSession.CategoryId = _selectedCategory?.CategoryId;
 
             using (var db = QuizDbContext.getContext())
             {

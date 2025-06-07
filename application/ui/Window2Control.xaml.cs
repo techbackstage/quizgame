@@ -25,7 +25,7 @@ namespace QuizGame.Application.UI
         public ICommand GenerateQuestionsCommand { get; }
 
         // Event for back button
-        public event EventHandler BackButtonClicked;
+        public event EventHandler? BackButtonClicked;
 
         public Window2Control()
         {
@@ -83,7 +83,7 @@ namespace QuizGame.Application.UI
             }
         }
         
-        private async void GenerateQuestions(object parameter)
+        private void GenerateQuestions(object parameter)
         {
             if (parameter is Category category)
             {
