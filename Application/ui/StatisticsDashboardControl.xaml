@@ -1,0 +1,79 @@
+<UserControl x:Class="QuizGame.Application.UI.StatisticsDashboardControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             d:DesignHeight="600" d:DesignWidth="800"
+             Background="#232533">
+    <Grid>
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel Margin="16">
+                <!-- Header -->
+                <TextBlock Text="Statistik-Dashboard" FontSize="32" FontWeight="Bold" Foreground="#E6E8F0" Margin="0,0,0,24"/>
+
+                <!-- General Stats Section -->
+                <Border Background="#191A23" CornerRadius="8" Padding="16" Margin="0,0,0,16">
+                    <StackPanel>
+                        <TextBlock Text="Allgemeine Übersicht" FontSize="22" FontWeight="SemiBold" Foreground="#E6E8F0" Margin="0,0,0,16"/>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0" HorizontalAlignment="Center">
+                                <TextBlock Text="Spiele gespielt" Foreground="#A6A8B8" FontSize="14"/>
+                                <TextBlock x:Name="GamesPlayedText" Text="-" FontSize="28" FontWeight="Bold" Foreground="#E6E8F0" HorizontalAlignment="Center"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="1" HorizontalAlignment="Center">
+                                <TextBlock Text="Durchschnittl. Punktzahl" Foreground="#A6A8B8" FontSize="14"/>
+                                <TextBlock x:Name="AvgScoreText" Text="-" FontSize="28" FontWeight="Bold" Foreground="#E6E8F0" HorizontalAlignment="Center"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="2" HorizontalAlignment="Center">
+                                <TextBlock Text="Durchschnittl. Zeit" Foreground="#A6A8B8" FontSize="14"/>
+                                <TextBlock x:Name="AvgTimeText" Text="-" FontSize="28" FontWeight="Bold" Foreground="#E6E8F0" HorizontalAlignment="Center"/>
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+                
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Win Rate Chart -->
+                    <Border Grid.Column="0" Background="#191A23" CornerRadius="8" Padding="16" Margin="0,0,8,16">
+                        <StackPanel>
+                            <TextBlock Text="Gewinnrate" FontSize="20" FontWeight="SemiBold" Foreground="#E6E8F0" Margin="0,0,0,12"/>
+                            <Canvas x:Name="WinRateCanvas" Height="150" Width="150" HorizontalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
+                    
+                    <!-- Performance per Category Chart -->
+                    <Border Grid.Column="1" Background="#191A23" CornerRadius="8" Padding="16" Margin="8,0,0,16">
+                        <StackPanel>
+                             <TextBlock Text="Leistung pro Kategorie" FontSize="20" FontWeight="SemiBold" Foreground="#E6E8F0" Margin="0,0,0,12"/>
+                            <Canvas x:Name="CategoryPerformanceCanvas" Height="150"/>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+
+                <!-- Progress over Time Section -->
+                <Border Background="#191A23" CornerRadius="8" Padding="16" Margin="0,0,0,16">
+                    <StackPanel>
+                        <TextBlock Text="Fortschritt über Zeit" FontSize="22" FontWeight="SemiBold" Foreground="#E6E8F0" Margin="0,0,0,16"/>
+                        <Canvas x:Name="ProgressCanvas" Height="200"/>
+                    </StackPanel>
+                </Border>
+                
+                 <!-- Back Button -->
+                <Button x:Name="BackButton" Content="Zurück" Width="120" Height="36" Click="BackButton_Click" HorizontalAlignment="Left" Margin="0,16,0,0"/>
+
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</UserControl> 

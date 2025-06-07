@@ -48,7 +48,7 @@ namespace QuizGame.Application
 
         private void ShowStatistik()
         {
-            var statistik = new Window7Control();
+            var statistik = new StatisticsDashboardControl();
             MainContent.Content = statistik;
         }
 
