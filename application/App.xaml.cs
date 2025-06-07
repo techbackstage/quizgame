@@ -2,6 +2,8 @@
 using System;
 using System.Windows;
 using System.IO;
+using PdfSharp.Fonts;
+using QuizGame.Application.Common;
 
 namespace QuizGame.Application
 {
@@ -31,7 +33,7 @@ namespace QuizGame.Application
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
-            PdfSharp.Fonts.GlobalFontSettings.UseWindowsFontsUnderWindows = true;
+            GlobalFontSettings.FontResolver = new MyFontResolver();
         }
     }
 }

@@ -6,8 +6,8 @@ namespace QuizGame.Application.UI
 {
     public partial class EditQuestionWindow : Window
     {
-        public string QuestionText { get; private set; }
-        public string Explanation { get; private set; }
+        public string QuestionText { get; private set; } = string.Empty;
+        public string Explanation { get; private set; } = string.Empty;
         public ObservableCollection<AnswerOption> Answers { get; } = new ObservableCollection<AnswerOption>();
         
         public EditQuestionWindow(Question question)

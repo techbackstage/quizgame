@@ -8,6 +8,10 @@ using QuizGame.Application.Model;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Diagnostics;
+using System.Collections.ObjectModel;
+using System.Windows.Input;
+using QuizGame.Application.ViewModels;
+using QuizGame.Application.Common;
 
 namespace QuizGame.Application.UI
 {
@@ -20,6 +24,9 @@ namespace QuizGame.Application.UI
         private QuizSession _currentQuizSession = new QuizSession { Date = DateTime.Now };
         private readonly Stopwatch _stopwatch = new Stopwatch();
         
+        public ObservableCollection<AnswerViewModel> CurrentAnswers { get; set; }
+        public ICommand AnswerCommand { get; }
+
         public Window5Control() : this(null)
         {
             // Common initialization can go here if needed, or leave empty if all is in the other constructor
@@ -28,13 +35,12 @@ namespace QuizGame.Application.UI
         public Window5Control(Category? selectedCategory)
         {
             InitializeComponent();
+            DataContext = this;
             _selectedCategory = selectedCategory;
-            
-            // Add event handlers for answer buttons
-            AnswerButton1.Click += AnswerButton_Click;
-            AnswerButton2.Click += AnswerButton_Click;
-            AnswerButton3.Click += AnswerButton_Click;
-            AnswerButton4.Click += AnswerButton_Click;
+
+            CurrentAnswers = new ObservableCollection<AnswerViewModel>();
+            AnswerCommand = new RelayCommand(SubmitAnswer);
+            AnswersItemsControl.ItemsSource = CurrentAnswers;
             
             _stopwatch.Start();
             LoadQuestion();
@@ -47,177 +53,66 @@ namespace QuizGame.Application.UI
                 _questionCounter++;
                 if (_questionCounter > TotalQuestions)
                 {
-                    // End of quiz reached
                     EndQuiz();
                     return;
                 }
                 
-                // Reset button colors to default
-                ResetAllButtonStyles();
-                
-                // Update progress text
                 QuestionProgressTextBlock.Text = $"Frage {_questionCounter} von {TotalQuestions}";
                 
                 using (var db = QuizDbContext.getContext())
                 {
-                    // Get a random question from the selected category if provided
                     var questionQuery = db.Questions.Include(q => q.Answers).AsQueryable();
-                    
                     if (_selectedCategory != null)
                     {
                         questionQuery = questionQuery.Where(q => q.CategoryId == _selectedCategory.CategoryId);
                     }
                     
-                    var question = questionQuery
-                        .OrderBy(q => Guid.NewGuid()) // Random order
-                        .FirstOrDefault();
+                    var question = questionQuery.OrderBy(q => Guid.NewGuid()).FirstOrDefault();
 
-                    if (question == null)
+                    if (question != null)
                     {
-                        // If no questions found in the selected category, create a sample question
-                        var category = _selectedCategory ?? 
-                            db.Categories.FirstOrDefault() ?? 
-                            CreateDefaultCategory(db);
-
-                        var newQuestion = new Question
-                        {
-                            Text = $"Beispielfrage für {category.Name}?",
-                            DifficultyLevel = 1,
-                            CategoryId = category.CategoryId,
-                            Answers = new System.Collections.Generic.List<AnswerOption>
-                            {
-                                new AnswerOption { Text = "Antwort 1", IsCorrect = false },
-                                new AnswerOption { Text = "Antwort 2", IsCorrect = false },
-                                new AnswerOption { Text = "Antwort 3", IsCorrect = true },
-                                new AnswerOption { Text = "Antwort 4", IsCorrect = false }
-                            }
-                        };
-                        db.Questions.Add(newQuestion);
-                        db.SaveChanges();
-
-                        // Reload with answer options
-                        question = db.Questions
-                            .Include(q => q.Answers)
-                            .Where(q => q.QuestionId == newQuestion.QuestionId)
-                            .FirstOrDefault();
-                    }
-
-                    // Defensive: check for nulls
-                    if (question != null && question.Answers != null)
-                    {
-                        var answers = question.Answers.OrderBy(a => Guid.NewGuid()).ToList(); // Randomize answers
                         QuestionTextBlock.Text = question.Text;
-                        AnswerButton1.Content = (answers.Count > 0) ? answers[0].Text : "";
-                        AnswerButton2.Content = (answers.Count > 1) ? answers[1].Text : "";
-                        AnswerButton3.Content = (answers.Count > 2) ? answers[2].Text : "";
-                        AnswerButton4.Content = (answers.Count > 3) ? answers[3].Text : "";
-                        
-                        // Store correct answer for validation
-                        AnswerButton1.Tag = (answers.Count > 0) ? answers[0].IsCorrect : false;
-                        AnswerButton2.Tag = (answers.Count > 1) ? answers[1].IsCorrect : false;
-                        AnswerButton3.Tag = (answers.Count > 2) ? answers[2].IsCorrect : false;
-                        AnswerButton4.Tag = (answers.Count > 3) ? answers[3].IsCorrect : false;
+                        CurrentAnswers.Clear();
+                        var answers = question.Answers.OrderBy(a => Guid.NewGuid()).ToList();
+                        foreach (var answer in answers)
+                        {
+                            CurrentAnswers.Add(new AnswerViewModel(answer));
+                        }
                     }
                     else
                     {
-                        QuestionTextBlock.Text = "Keine Frage gefunden.";
-                        AnswerButton1.Content = AnswerButton2.Content = AnswerButton3.Content = AnswerButton4.Content = "";
+                        QuestionTextBlock.Text = "Keine Frage für diese Kategorie gefunden.";
+                        CurrentAnswers.Clear();
                     }
                 }
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
-                System.Windows.MessageBox.Show($"Fehler beim Laden der Frage: {ex.Message}", "Fehler", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+                MessageBox.Show($"Fehler beim Laden der Frage: {ex.Message}", "Fehler", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
         
-        private Category CreateDefaultCategory(QuizDbContext db)
+        private async void SubmitAnswer(object? parameter)
         {
-            var category = new Category { Name = "Allgemein", Description = "Allgemeine Fragen" };
-            db.Categories.Add(category);
-            db.SaveChanges();
-            return category;
-        }
-        
-        private async void AnswerButton_Click(object sender, RoutedEventArgs e)
-        {
-            AnswerButton1.IsEnabled = false;
-            AnswerButton2.IsEnabled = false;
-            AnswerButton3.IsEnabled = false;
-            AnswerButton4.IsEnabled = false;
-
-            var clickedButton = sender as Button;
-            if (clickedButton == null) return;
-
-            bool answerIsCorrect = clickedButton.Tag is bool bVal && bVal;
-
-            if (answerIsCorrect)
+            if (parameter is AnswerViewModel selectedAnswer)
             {
-                _currentScore++;
-            }
+                selectedAnswer.IsSelected = true;
+                if (selectedAnswer.IsCorrect)
+                {
+                    _currentScore++;
+                }
 
-            var correctBrush = Brushes.Green;
-            var correctBorderBrush = Brushes.DarkGreen; // Darker green for border
-            var correctForegroundBrush = Brushes.White;
+                foreach (var answer in CurrentAnswers)
+                {
+                    answer.IsRevealed = true;
+                }
 
-            var defaultBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#23232b"));
-            var defaultBorderBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#262631"));
-            var defaultForegroundBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#bfc1ce"));
-
-            Button[] answerButtons = { AnswerButton1, AnswerButton2, AnswerButton3, AnswerButton4 };
-
-            foreach (Button btn in answerButtons)
-            {
-                bool isButtonCorrect = btn.Tag is bool currentButtonIsCorrect && currentButtonIsCorrect;
+                await Task.Delay(2000); 
                 
-                if (isButtonCorrect) // Use the pre-evaluated boolean
-                {
-                    btn.Background = correctBrush;
-                    btn.BorderBrush = correctBorderBrush;
-                    btn.Foreground = correctForegroundBrush;
-                }
-                else
-                {
-                    btn.Background = defaultBrush;
-                    btn.BorderBrush = defaultBorderBrush;
-                    btn.Foreground = defaultForegroundBrush;
-                }
-            }
-
-            await System.Threading.Tasks.Task.Delay(2000);
-
-            LoadQuestion();
-
-            if (_questionCounter <= TotalQuestions)
-            {
-                AnswerButton1.IsEnabled = true;
-                AnswerButton2.IsEnabled = true;
-                AnswerButton3.IsEnabled = true;
-                AnswerButton4.IsEnabled = true;
-                // Reset styles for next question explicitly here if not done in LoadQuestion
-                // ResetAllButtonStyles(); // Consider if this is needed here or in LoadQuestion
+                LoadQuestion();
             }
         }
         
-        private void ResetButtonStyle(Button button)
-        {
-            // Reset only the dynamically changed properties to their default visual state.
-            // These values should match the initial state defined in XAML (either in Style or direct attributes).
-            button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#23232b"));
-            button.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#bfc1ce"));
-            button.BorderBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#262631"));
-            // Do NOT clear the style, set BorderThickness, or call UpdateLayout(), 
-            // as these can interfere with the XAML-defined style and layout.
-        }
-        
-        private void ResetAllButtonStyles()
-        {
-            ResetButtonStyle(AnswerButton1);
-            ResetButtonStyle(AnswerButton2);
-            ResetButtonStyle(AnswerButton3);
-            ResetButtonStyle(AnswerButton4);
-        }
-
         private void EndQuiz()
         {
             _stopwatch.Stop();
@@ -232,15 +127,9 @@ namespace QuizGame.Application.UI
                 db.SaveChanges();
             }
 
-            var mainWindow = Window.GetWindow(this) as MainWindow;
-            if (mainWindow != null)
+            if (Window.GetWindow(this) is MainWindow mainWindow)
             {
-                mainWindow.ShowScoreDisplay(_currentQuizSession); // Navigate to score display
-            }
-            else
-            {
-                // Fallback if cast fails or window is not found
-                MessageBox.Show($"Quiz beendet! Deine Punktzahl: {_currentScore}/{TotalQuestions}", "Quiz Ende", MessageBoxButton.OK, MessageBoxImage.Information);
+                mainWindow.ShowScoreDisplay(_currentQuizSession);
             }
         }
     }

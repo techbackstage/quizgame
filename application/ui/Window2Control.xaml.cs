@@ -13,6 +13,8 @@ using PdfSharp.Pdf;
 using PdfSharp.Drawing;
 using Microsoft.Win32;
 using System.IO;
+using QuizGame.Application.Common;
+using QuizGame.Application.Services;
 
 namespace QuizGame.Application.UI
 {
@@ -51,7 +53,7 @@ namespace QuizGame.Application.UI
             CategoryListPanel.ItemsSource = Categories;
         }
 
-        private void DeleteCategory(object parameter)
+        private void DeleteCategory(object? parameter)
         {
             if (parameter is Category cat)
             {
@@ -73,7 +75,7 @@ namespace QuizGame.Application.UI
             }
         }
 
-        private void ShowQuestions(object parameter)
+        private void ShowQuestions(object? parameter)
         {
             if (parameter is Category cat)
             {
@@ -83,76 +85,45 @@ namespace QuizGame.Application.UI
             }
         }
         
-        private void GenerateQuestions(object parameter)
+        private async void GenerateQuestions(object? parameter)
         {
             if (parameter is Category category)
             {
+                Mouse.OverrideCursor = Cursors.Wait;
                 try
                 {
-                    // Show loading indicator
-                    var cursor = Mouse.OverrideCursor;
-                    Mouse.OverrideCursor = Cursors.Wait;
-                    
-                    // Save questions to database
-                    using (var db = QuizDbContext.getContext())
+                    var questions = await Task.Run(() => ApiController.Run(category.Name));
+
+                    if (questions.Any())
                     {
-                        var questions = ApiController.Run(category.Name);
-                    
-                        if (questions.Count > 0)
+                        using (var db = QuizDbContext.getContext())
                         {
                             foreach (var question in questions)
                             {
                                 question.CategoryId = category.CategoryId;
-
                                 db.Questions.Add(question);
-                                
-                                // Update the UI counter by refreshing the list
-                                System.Windows.Application.Current.Dispatcher.Invoke(() => {
-                                    var dbCategory = db.Categories
-                                        .Include(c => c.Questions)
-                                        .FirstOrDefault(c => c.CategoryId == category.CategoryId);
-                                        
-                                    if (dbCategory != null)
-                                    {
-                                        var uiCategory = Categories.FirstOrDefault(c => c.CategoryId == category.CategoryId);
-                                        if (uiCategory != null)
-                                        {
-                                            uiCategory.Questions.Add(question);
-                                        }
-                                    }
-                                });
                             }
-                            
-                            db.SaveChanges();
-                            
-                            // Show success message
-                            System.Windows.Application.Current.Dispatcher.Invoke(() => {
-                                MessageBox.Show($"{questions.Count} Fragen für '{category.Name}' erstellt.", "Fragen generiert", 
-                                    MessageBoxButton.OK, MessageBoxImage.Information);
-                            });
-                            
-                            // Reload categories to refresh the UI
-                            System.Windows.Application.Current.Dispatcher.Invoke(() => {
-                                LoadCategories();
-                            });
+                            await db.SaveChangesAsync();
                         }
-                        else
-                        {
-                            System.Windows.Application.Current.Dispatcher.Invoke(() => {
-                                MessageBox.Show("Keine Fragen generiert. Möglicherweise ist die API nicht verfügbar oder die Antwort konnte nicht geparst werden. Bitte versuchen Sie es erneut.", 
-                                    "Fehler", MessageBoxButton.OK, MessageBoxImage.Warning);
-                            });
-                        }
+
+                        MessageBox.Show($"{questions.Count} Fragen für '{category.Name}' erstellt.", "Fragen generiert",
+                            MessageBoxButton.OK, MessageBoxImage.Information);
+                        
+                        LoadCategories(); // Refresh UI
                     }
-                    
-                    // Restore cursor
-                    Mouse.OverrideCursor = cursor;
+                    else
+                    {
+                        MessageBox.Show("Keine Fragen generiert. API möglicherweise nicht verfügbar.",
+                            "Fehler", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    }
                 }
-                catch (System.Exception ex)
+                catch (Exception ex)
                 {
-                    // Restore cursor on error
-                    Mouse.OverrideCursor = null;
                     MessageBox.Show($"Fehler beim Generieren von Fragen: {ex.Message}", "Fehler", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+                finally
+                {
+                    Mouse.OverrideCursor = null;
                 }
             }
         }
@@ -213,7 +184,8 @@ namespace QuizGame.Application.UI
                 try
                 {
                     Mouse.OverrideCursor = Cursors.Wait;
-                    CreatePdf(selectedCategories, saveFileDialog.FileName);
+                    var pdfService = new PdfExportService();
+                    pdfService.CreatePdf(selectedCategories, saveFileDialog.FileName);
                     MessageBox.Show($"Ausgewählte Kategorien wurden erfolgreich nach '{saveFileDialog.FileName}' exportiert.", "Export erfolgreich", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
                 catch (Exception ex)
@@ -226,107 +198,5 @@ namespace QuizGame.Application.UI
                 }
             }
         }
-
-        private void CreatePdf(List<Category> categoriesToExport, string filePath)
-        {
-            PdfDocument document = new PdfDocument();
-            document.Info.Title = "Quiz-Kategorien Export";
-            
-            XFont fontTitle = new XFont("Arial", 20, XFontStyleEx.Bold);
-            XFont fontCategory = new XFont("Arial", 12, XFontStyleEx.Bold);
-            XFont fontQuestion = new XFont("Arial", 10, XFontStyleEx.Regular);
-            XFont fontCorrectAnswer = new XFont("Arial", 8, XFontStyleEx.Bold);
-            XFont fontAnswer = new XFont("Arial", 10, XFontStyleEx.Regular);
-
-            double yPosition = 40; // Initial Y position for drawing
-            const double xMargin = 40;
-            const double pageHeight = 842; // A4 page height
-            const double lineHeight = 18;
-            const double paragraphSpacing = 10;
-
-            PdfPage page = document.AddPage();
-            XGraphics gfx = XGraphics.FromPdfPage(page);
-
-            Func<double, double> checkAndCreateNewPage = (currentY) => {
-                if (currentY > pageHeight - (2 * xMargin)) // Check if space is left, considering bottom margin
-                {
-                    page = document.AddPage();
-                    gfx = XGraphics.FromPdfPage(page);
-                    return xMargin; // Reset Y to top margin
-                }
-                return currentY; // No change if no new page
-            };
-
-            void drawText(string text, XFont font, XBrush brush, double x, double y)
-            {
-                gfx.DrawString(text, font, brush, new XPoint(x, y));
-            }
-
-            drawText("Exportierte Quiz-Kategorien", fontTitle, XBrushes.Black, xMargin, yPosition);
-            yPosition += fontTitle.GetHeight() + paragraphSpacing * 2;
-
-            using (var db = QuizDbContext.getContext())
-            {
-                foreach (var category in categoriesToExport)
-                {
-                    yPosition = checkAndCreateNewPage(yPosition);
-                    gfx.DrawString($"Kategorie: {category.Name}", fontCategory, XBrushes.DarkBlue, xMargin, yPosition);
-                    yPosition += fontCategory.GetHeight() + paragraphSpacing;
-
-                    // Load questions for the category if not already loaded (should be eager-loaded ideally)
-                    var dbCategory = db.Categories.Include(c => c.Questions).ThenInclude(q => q.Answers).FirstOrDefault(c => c.CategoryId == category.CategoryId);
-                    if (dbCategory == null || !dbCategory.Questions.Any())
-                    {
-                        yPosition = checkAndCreateNewPage(yPosition);
-                        gfx.DrawString("  Keine Fragen in dieser Kategorie.", fontAnswer, XBrushes.Gray, xMargin + 10, yPosition);
-                        yPosition += lineHeight;
-                        continue;
-                    }
-
-                    foreach (var question in dbCategory.Questions)
-                    {
-                        yPosition = checkAndCreateNewPage(yPosition);
-                        gfx.DrawString($"Frage: {question.Text}", fontQuestion, XBrushes.Black, xMargin + 10, yPosition);
-                        yPosition += fontQuestion.GetHeight() + paragraphSpacing / 2;
-
-                        if (!question.Answers.Any())
-                        {
-                            yPosition = checkAndCreateNewPage(yPosition);
-                            gfx.DrawString("    Keine Antworten für diese Frage.", fontAnswer, XBrushes.Gray, xMargin + 20, yPosition);
-                            yPosition += lineHeight;
-                            continue;
-                        }
-                        
-                        foreach (var answer in question.Answers.OrderBy(a => a.AnswerOptionId)) // Ensure consistent order
-                        {
-                            yPosition = checkAndCreateNewPage(yPosition);
-                            XFont currentAnswerFont = answer.IsCorrect ? fontCorrectAnswer : fontAnswer;
-                            XBrush currentAnswerBrush = answer.IsCorrect ? XBrushes.Green : XBrushes.Black;
-                            string prefix = answer.IsCorrect ? "Richtige Antwort: " : "Antwort: ";
-                            
-                            gfx.DrawString($"{prefix}{answer.Text}", currentAnswerFont, currentAnswerBrush, xMargin + 20, yPosition);
-                            yPosition += currentAnswerFont.GetHeight();
-                        }
-                        yPosition += paragraphSpacing; // Space after each question block
-                    }
-                    yPosition += paragraphSpacing * 1.5; // Extra space after each category
-                }
-            }
-            document.Save(filePath);
-        }
-    }
-    // Simple RelayCommand implementation
-    public class RelayCommand : ICommand
-    {
-        private readonly System.Action<object> _execute;
-        private readonly System.Predicate<object> _canExecute;
-        public RelayCommand(System.Action<object> execute, System.Predicate<object> canExecute = null)
-        {
-            _execute = execute;
-            _canExecute = canExecute;
-        }
-        public bool CanExecute(object parameter) => _canExecute == null || _canExecute(parameter);
-        public void Execute(object parameter) => _execute(parameter);
-        public event System.EventHandler CanExecuteChanged { add { } remove { } }
     }
 }
