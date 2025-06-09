@@ -44,7 +44,7 @@ namespace QuizGame.Application.Services
             gfx.DrawString("Exportierte Quiz-Kategorien", fontTitle, XBrushes.Black, xMargin, yPosition);
             yPosition += fontTitle.GetHeight() + paragraphSpacing * 2;
 
-            using (var db = QuizDbContext.getContext())
+            using (var db = QuizDbContext.GetContext())
             {
                 foreach (var category in categoriesToExport)
                 {
@@ -52,8 +52,7 @@ namespace QuizGame.Application.Services
                     gfx.DrawString($"Kategorie: {category.Name}", fontCategory, XBrushes.DarkBlue, xMargin, yPosition);
                     yPosition += fontCategory.GetHeight() + paragraphSpacing;
 
-                    var dbCategory = db.Categories.Include(c => c.Questions).ThenInclude(q => q.Answers).FirstOrDefault(c => c.CategoryId == category.CategoryId);
-                    if (dbCategory == null || !dbCategory.Questions.Any())
+                    if (!category.Questions.Any())
                     {
                         CheckAndCreateNewPage();
                         gfx.DrawString("  Keine Fragen in dieser Kategorie.", fontAnswer, XBrushes.Gray, xMargin + 10, yPosition);
@@ -61,7 +60,7 @@ namespace QuizGame.Application.Services
                         continue;
                     }
 
-                    foreach (var question in dbCategory.Questions)
+                    foreach (var question in category.Questions)
                     {
                         CheckAndCreateNewPage();
                         gfx.DrawString($"Frage: {question.Text}", fontQuestion, XBrushes.Black, xMargin + 10, yPosition);

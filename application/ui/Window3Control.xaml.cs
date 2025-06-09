@@ -21,7 +21,7 @@ namespace QuizGame.Application.UI
                 MessageBox.Show("Bitte einen Kategorienamen eingeben.", "Fehler", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
-            using (var db = QuizDbContext.getContext())
+            using (var db = QuizDbContext.GetContext())
             {
                 if (db.Categories.Any(c => c.Name == name))
                 {

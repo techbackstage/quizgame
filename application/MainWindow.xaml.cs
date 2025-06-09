@@ -15,7 +15,7 @@ namespace QuizGame.Application
                 
 
                 // Ensure the database is created
-                using (var db = QuizDbContext.getContext())
+                using (var db = QuizDbContext.GetContext())
                 {
                     db.Database.EnsureCreated();
                 }

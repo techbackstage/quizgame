@@ -5,14 +5,10 @@ using System.Windows.Input;
 using QuizGame.Application.Database;
 using QuizGame.Application.Model;
 using System.Linq;
-using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 using QuizGame.API;
-using PdfSharp.Pdf;
-using PdfSharp.Drawing;
 using Microsoft.Win32;
-using System.IO;
 using QuizGame.Application.Common;
 using QuizGame.Application.Services;
 
@@ -45,9 +41,9 @@ namespace QuizGame.Application.UI
         private void LoadCategories()
         {
             Categories.Clear();
-            using (var db = QuizDbContext.getContext())
+            using (var db = QuizDbContext.GetContext())
             {
-                foreach (var cat in db.Categories.Include(c => c.Questions).ToList())
+                foreach (var cat in db.Categories.Include(c => c.Questions).ThenInclude(q => q.Answers).ToList())
                     Categories.Add(cat);
             }
             CategoryListPanel.ItemsSource = Categories;
@@ -60,7 +56,7 @@ namespace QuizGame.Application.UI
                 var result = MessageBox.Show($"Kategorie '{cat.Name}' wirklich löschen?", "Löschen bestätigen", MessageBoxButton.YesNo, MessageBoxImage.Warning);
                 if (result == MessageBoxResult.Yes)
                 {
-                    using (var db = QuizDbContext.getContext())
+                    using (var db = QuizDbContext.GetContext())
                     {
                         var dbCat = db.Categories.Include(c => c.Questions).FirstOrDefault(c => c.CategoryId == cat.CategoryId);
                         if (dbCat != null)
@@ -124,7 +120,7 @@ namespace QuizGame.Application.UI
 
                 if (questions != null && questions.Any())
                 {
-                    using (var db = QuizDbContext.getContext())
+                    using (var db = QuizDbContext.GetContext())
                     {
                         foreach (var q in questions)
                         {
@@ -193,8 +189,6 @@ namespace QuizGame.Application.UI
             {
                 category.IsSelectedForExport = true;
             }
-            // Refresh the ItemsControl binding if necessary, though TwoWay binding should handle it.
-             CategoryListPanel.Items.Refresh();
         }
 
         // Event handler for SelectAllCheckBox
@@ -204,8 +198,6 @@ namespace QuizGame.Application.UI
             {
                 category.IsSelectedForExport = false;
             }
-            // Refresh the ItemsControl binding
-            CategoryListPanel.Items.Refresh();
         }
         
         private void ExportPdfButton_Click(object sender, RoutedEventArgs e)

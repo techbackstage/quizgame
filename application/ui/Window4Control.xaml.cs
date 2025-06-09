@@ -35,7 +35,7 @@ namespace QuizGame.Application.UI
         private void LoadCategories()
         {
             Categories.Clear();
-            using (var db = QuizDbContext.getContext())
+            using (var db = QuizDbContext.GetContext())
             {
                 foreach (var cat in db.Categories.OrderBy(c => c.Name).ToList())
                 {

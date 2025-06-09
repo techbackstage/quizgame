@@ -26,7 +26,7 @@ namespace QuizGame.Application.UI
 
         private void LoadStatistics()
         {
-            using (var db = QuizDbContext.getContext())
+            using (var db = QuizDbContext.GetContext())
             {
                 var sessions = db.QuizSessions.Include(s => s.Category).ToList();
                 
@@ -47,7 +47,7 @@ namespace QuizGame.Application.UI
         {
             GamesPlayedText.Text = sessions.Count.ToString();
             
-            double avgScore = sessions.Average(s => (double)s.Score / s.TotalQuestions * 100);
+            double avgScore = sessions.Where(s => s.TotalQuestions > 0).Average(s => (double)s.Score / s.TotalQuestions * 100);
             AvgScoreText.Text = $"{avgScore:F1}%";
 
             double avgTimeInSeconds = sessions.Average(s => s.CompletionTime.TotalSeconds);

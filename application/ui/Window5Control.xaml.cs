@@ -86,7 +86,7 @@ namespace QuizGame.Application.UI
                 QuestionProgressTextBlock.Text = $"Frage {_questionCounter} von {TotalQuestions}";
                 ScoreTextBlock.Text = $"Punkte: {_currentScore}";
 
-                using (var db = QuizDbContext.getContext())
+                using (var db = QuizDbContext.GetContext())
                 {
                     var questionQuery = db.Questions.Include(q => q.Answers).AsQueryable();
                     if (_selectedCategory != null)
@@ -162,7 +162,7 @@ namespace QuizGame.Application.UI
             _currentQuizSession.CompletionTime = _stopwatch.Elapsed;
             _currentQuizSession.CategoryId = _selectedCategory?.CategoryId;
 
-            using (var db = QuizDbContext.getContext())
+            using (var db = QuizDbContext.GetContext())
             {
                 db.QuizSessions.Add(_currentQuizSession);
                 db.SaveChanges();
