@@ -8,6 +8,11 @@ using QuizGame.Application.Model;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Diagnostics;
+using System.Collections.ObjectModel;
+using System.Windows.Input;
+using QuizGame.Application.ViewModels;
+using QuizGame.Application.Common;
+using System.Windows.Threading;
 
 namespace QuizGame.Application.UI
 {
@@ -17,9 +22,18 @@ namespace QuizGame.Application.UI
         private int _questionCounter = 0;
         private int _currentScore = 0;
         private const int TotalQuestions = 10;
+        private const int TimePerQuestion = 20; // seconds
+        private Question? _currentQuestion;
+
         private QuizSession _currentQuizSession = new QuizSession { Date = DateTime.Now };
         private readonly Stopwatch _stopwatch = new Stopwatch();
-        
+        private readonly DispatcherTimer _questionTimer = new DispatcherTimer();
+        private int _remainingTime;
+        private bool _canAnswer;
+
+        public ObservableCollection<AnswerViewModel> CurrentAnswers { get; set; }
+        public ICommand AnswerCommand { get; }
+
         public Window5Control() : this(null)
         {
             // Common initialization can go here if needed, or leave empty if all is in the other constructor
@@ -28,16 +42,29 @@ namespace QuizGame.Application.UI
         public Window5Control(Category? selectedCategory)
         {
             InitializeComponent();
+            DataContext = this;
             _selectedCategory = selectedCategory;
+
+            CurrentAnswers = new ObservableCollection<AnswerViewModel>();
+            AnswerCommand = new RelayCommand(SubmitAnswer, (p) => _canAnswer);
+            AnswersItemsControl.ItemsSource = CurrentAnswers;
             
-            // Add event handlers for answer buttons
-            AnswerButton1.Click += AnswerButton_Click;
-            AnswerButton2.Click += AnswerButton_Click;
-            AnswerButton3.Click += AnswerButton_Click;
-            AnswerButton4.Click += AnswerButton_Click;
-            
+            _questionTimer.Interval = TimeSpan.FromSeconds(1);
+            _questionTimer.Tick += QuestionTimer_Tick;
+
             _stopwatch.Start();
             LoadQuestion();
+        }
+
+        private void QuestionTimer_Tick(object? sender, EventArgs e)
+        {
+            _remainingTime--;
+            TimerTextBlock.Text = $"00:{_remainingTime:00}";
+            TimeProgressBar.Value = (_remainingTime / (double)TimePerQuestion) * 100;
+            if (_remainingTime <= 0)
+            {
+                SubmitAnswer(null); // Timeout
+            }
         }
 
         private void LoadQuestion()
@@ -47,175 +74,84 @@ namespace QuizGame.Application.UI
                 _questionCounter++;
                 if (_questionCounter > TotalQuestions)
                 {
-                    // End of quiz reached
                     EndQuiz();
                     return;
                 }
                 
-                // Reset button colors to default
-                ResetAllButtonStyles();
-                
-                // Update progress text
+                ExplanationPanel.Visibility = Visibility.Collapsed;
+                AnswersItemsControl.IsEnabled = true;
+                _canAnswer = true;
+                CommandManager.InvalidateRequerySuggested();
+
                 QuestionProgressTextBlock.Text = $"Frage {_questionCounter} von {TotalQuestions}";
-                
-                using (var db = QuizDbContext.getContext())
+                ScoreTextBlock.Text = $"Punkte: {_currentScore}";
+
+                using (var db = QuizDbContext.GetContext())
                 {
-                    // Get a random question from the selected category if provided
                     var questionQuery = db.Questions.Include(q => q.Answers).AsQueryable();
-                    
                     if (_selectedCategory != null)
-                    {
                         questionQuery = questionQuery.Where(q => q.CategoryId == _selectedCategory.CategoryId);
-                    }
                     
-                    var question = questionQuery
-                        .OrderBy(q => Guid.NewGuid()) // Random order
-                        .FirstOrDefault();
+                    _currentQuestion = questionQuery.OrderBy(q => Guid.NewGuid()).FirstOrDefault();
 
-                    if (question == null)
+                    if (_currentQuestion != null)
                     {
-                        // If no questions found in the selected category, create a sample question
-                        var category = _selectedCategory ?? 
-                            db.Categories.FirstOrDefault() ?? 
-                            CreateDefaultCategory(db);
-
-                        var newQuestion = new Question
-                        {
-                            Text = $"Beispielfrage für {category.Name}?",
-                            DifficultyLevel = 1,
-                            CategoryId = category.CategoryId,
-                            Answers = new System.Collections.Generic.List<AnswerOption>
-                            {
-                                new AnswerOption { Text = "Antwort 1", IsCorrect = false },
-                                new AnswerOption { Text = "Antwort 2", IsCorrect = false },
-                                new AnswerOption { Text = "Antwort 3", IsCorrect = true },
-                                new AnswerOption { Text = "Antwort 4", IsCorrect = false }
-                            }
-                        };
-                        db.Questions.Add(newQuestion);
-                        db.SaveChanges();
-
-                        // Reload with answer options
-                        question = db.Questions
-                            .Include(q => q.Answers)
-                            .Where(q => q.QuestionId == newQuestion.QuestionId)
-                            .FirstOrDefault();
-                    }
-
-                    // Defensive: check for nulls
-                    if (question != null && question.Answers != null)
-                    {
-                        var answers = question.Answers.OrderBy(a => Guid.NewGuid()).ToList(); // Randomize answers
-                        QuestionTextBlock.Text = question.Text;
-                        AnswerButton1.Content = (answers.Count > 0) ? answers[0].Text : "";
-                        AnswerButton2.Content = (answers.Count > 1) ? answers[1].Text : "";
-                        AnswerButton3.Content = (answers.Count > 2) ? answers[2].Text : "";
-                        AnswerButton4.Content = (answers.Count > 3) ? answers[3].Text : "";
+                        QuestionTextBlock.Text = _currentQuestion.Text;
+                        CurrentAnswers.Clear();
+                        var answers = _currentQuestion.Answers.OrderBy(a => Guid.NewGuid()).ToList();
+                        foreach (var answer in answers)
+                            CurrentAnswers.Add(new AnswerViewModel(answer));
                         
-                        // Store correct answer for validation
-                        AnswerButton1.Tag = (answers.Count > 0) ? answers[0].IsCorrect : false;
-                        AnswerButton2.Tag = (answers.Count > 1) ? answers[1].IsCorrect : false;
-                        AnswerButton3.Tag = (answers.Count > 2) ? answers[2].IsCorrect : false;
-                        AnswerButton4.Tag = (answers.Count > 3) ? answers[3].IsCorrect : false;
+                        _remainingTime = TimePerQuestion;
+                        TimerTextBlock.Text = $"00:{_remainingTime:00}";
+                        TimeProgressBar.Value = 100;
+                        _questionTimer.Start();
                     }
                     else
                     {
-                        QuestionTextBlock.Text = "Keine Frage gefunden.";
-                        AnswerButton1.Content = AnswerButton2.Content = AnswerButton3.Content = AnswerButton4.Content = "";
+                        QuestionTextBlock.Text = "Keine Frage für diese Kategorie gefunden.";
+                        CurrentAnswers.Clear();
+                        _questionTimer.Stop();
                     }
                 }
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
-                System.Windows.MessageBox.Show($"Fehler beim Laden der Frage: {ex.Message}", "Fehler", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+                MessageBox.Show($"Fehler beim Laden der Frage: {ex.Message}", "Fehler", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
         
-        private Category CreateDefaultCategory(QuizDbContext db)
+        private void SubmitAnswer(object? parameter)
         {
-            var category = new Category { Name = "Allgemein", Description = "Allgemeine Fragen" };
-            db.Categories.Add(category);
-            db.SaveChanges();
-            return category;
+            _questionTimer.Stop();
+            _canAnswer = false;
+            CommandManager.InvalidateRequerySuggested();
+            AnswersItemsControl.IsEnabled = false;
+
+            if (parameter is AnswerViewModel selectedAnswer)
+            {
+                selectedAnswer.IsSelected = true;
+                if (selectedAnswer.IsCorrect)
+                {
+                    _currentScore++;
+                    ScoreTextBlock.Text = $"Punkte: {_currentScore}";
+                }
+            }
+
+            foreach (var answer in CurrentAnswers)
+            {
+                answer.IsRevealed = true;
+            }
+            
+            ExplanationTextBlock.Text = string.IsNullOrWhiteSpace(_currentQuestion?.Explanation)
+                ? "Für diese Frage ist keine Erklärung verfügbar."
+                : _currentQuestion.Explanation;
+            ExplanationPanel.Visibility = Visibility.Visible;
         }
-        
-        private async void AnswerButton_Click(object sender, RoutedEventArgs e)
+
+        private void NextQuestionButton_Click(object sender, RoutedEventArgs e)
         {
-            AnswerButton1.IsEnabled = false;
-            AnswerButton2.IsEnabled = false;
-            AnswerButton3.IsEnabled = false;
-            AnswerButton4.IsEnabled = false;
-
-            var clickedButton = sender as Button;
-            if (clickedButton == null) return;
-
-            bool answerIsCorrect = clickedButton.Tag is bool bVal && bVal;
-
-            if (answerIsCorrect)
-            {
-                _currentScore++;
-            }
-
-            var correctBrush = Brushes.Green;
-            var correctBorderBrush = Brushes.DarkGreen; // Darker green for border
-            var correctForegroundBrush = Brushes.White;
-
-            var defaultBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#23232b"));
-            var defaultBorderBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#262631"));
-            var defaultForegroundBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#bfc1ce"));
-
-            Button[] answerButtons = { AnswerButton1, AnswerButton2, AnswerButton3, AnswerButton4 };
-
-            foreach (Button btn in answerButtons)
-            {
-                bool isButtonCorrect = btn.Tag is bool currentButtonIsCorrect && currentButtonIsCorrect;
-                
-                if (isButtonCorrect) // Use the pre-evaluated boolean
-                {
-                    btn.Background = correctBrush;
-                    btn.BorderBrush = correctBorderBrush;
-                    btn.Foreground = correctForegroundBrush;
-                }
-                else
-                {
-                    btn.Background = defaultBrush;
-                    btn.BorderBrush = defaultBorderBrush;
-                    btn.Foreground = defaultForegroundBrush;
-                }
-            }
-
-            await System.Threading.Tasks.Task.Delay(2000);
-
             LoadQuestion();
-
-            if (_questionCounter <= TotalQuestions)
-            {
-                AnswerButton1.IsEnabled = true;
-                AnswerButton2.IsEnabled = true;
-                AnswerButton3.IsEnabled = true;
-                AnswerButton4.IsEnabled = true;
-                // Reset styles for next question explicitly here if not done in LoadQuestion
-                // ResetAllButtonStyles(); // Consider if this is needed here or in LoadQuestion
-            }
-        }
-        
-        private void ResetButtonStyle(Button button)
-        {
-            // Reset only the dynamically changed properties to their default visual state.
-            // These values should match the initial state defined in XAML (either in Style or direct attributes).
-            button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#23232b"));
-            button.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#bfc1ce"));
-            button.BorderBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#262631"));
-            // Do NOT clear the style, set BorderThickness, or call UpdateLayout(), 
-            // as these can interfere with the XAML-defined style and layout.
-        }
-        
-        private void ResetAllButtonStyles()
-        {
-            ResetButtonStyle(AnswerButton1);
-            ResetButtonStyle(AnswerButton2);
-            ResetButtonStyle(AnswerButton3);
-            ResetButtonStyle(AnswerButton4);
         }
 
         private void EndQuiz()
@@ -226,21 +162,15 @@ namespace QuizGame.Application.UI
             _currentQuizSession.CompletionTime = _stopwatch.Elapsed;
             _currentQuizSession.CategoryId = _selectedCategory?.CategoryId;
 
-            using (var db = QuizDbContext.getContext())
+            using (var db = QuizDbContext.GetContext())
             {
                 db.QuizSessions.Add(_currentQuizSession);
                 db.SaveChanges();
             }
 
-            var mainWindow = Window.GetWindow(this) as MainWindow;
-            if (mainWindow != null)
+            if (Window.GetWindow(this) is MainWindow mainWindow)
             {
-                mainWindow.ShowScoreDisplay(_currentQuizSession); // Navigate to score display
-            }
-            else
-            {
-                // Fallback if cast fails or window is not found
-                MessageBox.Show($"Quiz beendet! Deine Punktzahl: {_currentScore}/{TotalQuestions}", "Quiz Ende", MessageBoxButton.OK, MessageBoxImage.Information);
+                mainWindow.ShowScoreDisplay(_currentQuizSession);
             }
         }
     }

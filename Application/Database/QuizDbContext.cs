@@ -11,7 +11,7 @@ public class QuizDbContext : DbContext
     public DbSet<AnswerOption> AnswerOptions { get; set; }
     public DbSet<QuizSession> QuizSessions { get; set; }
 
-    public static QuizDbContext getContext()
+    public static QuizDbContext GetContext()
     {
         var options = new DbContextOptionsBuilder<QuizDbContext>()
                 .UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=QuizDb;Trusted_Connection=True;")
