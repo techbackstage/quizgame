@@ -89,41 +89,86 @@ namespace QuizGame.Application.UI
         {
             if (parameter is Category category)
             {
-                Mouse.OverrideCursor = Cursors.Wait;
-                try
-                {
-                    var questions = await Task.Run(() => ApiController.Run(category.Name));
+                LoadingOverlay.Visibility = Visibility.Visible;
+                LoadingProgressBar.Value = 0;
+                LoadingProgressText.Text = "0%";
 
-                    if (questions.Any())
+                Exception? apiException = null;
+                System.Collections.Generic.List<Question>? questions = null;
+
+                var generateQuestionsTask = Task.Run(() =>
+                {
+                    try
                     {
-                        using (var db = QuizDbContext.getContext())
+                        questions = ApiController.Run(category.Name);
+                    }
+                    catch (Exception ex)
+                    {
+                        apiException = ex;
+                    }
+                });
+
+                await AnimateProgressBar(generateQuestionsTask);
+                await generateQuestionsTask;
+
+                LoadingProgressBar.Value = 100;
+                LoadingProgressText.Text = "100%";
+                await Task.Delay(500);
+                LoadingOverlay.Visibility = Visibility.Collapsed;
+
+                if (apiException != null)
+                {
+                    MessageBox.Show($"Fehler beim Generieren von Fragen: {apiException.Message}", "Fehler", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+
+                if (questions != null && questions.Any())
+                {
+                    using (var db = QuizDbContext.getContext())
+                    {
+                        foreach (var q in questions)
                         {
-                            foreach (var question in questions)
-                            {
-                                question.CategoryId = category.CategoryId;
-                                db.Questions.Add(question);
-                            }
-                            await db.SaveChangesAsync();
+                            q.CategoryId = category.CategoryId;
+                            db.Questions.Add(q);
                         }
+                        await db.SaveChangesAsync();
+                    }
 
-                        MessageBox.Show($"{questions.Count} Fragen für '{category.Name}' erstellt.", "Fragen generiert",
-                            MessageBoxButton.OK, MessageBoxImage.Information);
-                        
-                        LoadCategories(); // Refresh UI
-                    }
-                    else
-                    {
-                        MessageBox.Show("Keine Fragen generiert. API möglicherweise nicht verfügbar.",
-                            "Fehler", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    }
+                    MessageBox.Show($"{questions.Count} Fragen für '{category.Name}' erstellt.", "Fragen generiert",
+                        MessageBoxButton.OK, MessageBoxImage.Information);
+
+                    LoadCategories(); // Refresh UI
                 }
-                catch (Exception ex)
+                else
                 {
-                    MessageBox.Show($"Fehler beim Generieren von Fragen: {ex.Message}", "Fehler", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show("Keine Fragen generiert. API möglicherweise nicht verfügbar.",
+                        "Fehler", MessageBoxButton.OK, MessageBoxImage.Warning);
                 }
-                finally
+            }
+        }
+
+        private async Task AnimateProgressBar(Task apiTask)
+        {
+            // Animate to 90% over ~5 seconds
+            for (int i = 0; i <= 90; i++)
+            {
+                if (apiTask.IsCompleted)
                 {
-                    Mouse.OverrideCursor = null;
+                    break;
+                }
+                LoadingProgressBar.Value = i;
+                LoadingProgressText.Text = $"{i}%";
+                await Task.Delay(55); // ~5 seconds to reach 90%
+            }
+            
+            // If not completed, stay at 90% and wait.
+            if (!apiTask.IsCompleted)
+            {
+                LoadingProgressBar.Value = 90;
+                LoadingProgressText.Text = "90%";
+                while (!apiTask.IsCompleted)
+                {
+                    await Task.Delay(100);
                 }
             }
         }

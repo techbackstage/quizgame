@@ -12,12 +12,12 @@
                 </StackPanel>
                 <TextBlock Text="Quiz beginnen" Foreground="#E6E8F0" FontSize="32" FontWeight="Bold" Margin="0,0,0,24"/>
                 <TextBlock Text="Kategorie" Foreground="#E6E8F0" FontSize="18" Margin="0,0,0,8"/>
-                <ComboBox x:Name="CategoryComboBox" Height="40" FontSize="18" Background="#2A2C3C" Foreground="#FFFFFF" BorderThickness="1" BorderBrush="#3D4054" Margin="0,0,0,24"
+                <ComboBox x:Name="CategoryComboBox" Height="40" FontSize="18" Background="#2A2C3C" Foreground="#737373" BorderThickness="1" BorderBrush="#3D4054" Margin="0,0,0,24"
                          ItemsSource="{Binding Categories}" DisplayMemberPath="Name" SelectedValuePath="CategoryId">
                     <ComboBox.Resources>
                         <SolidColorBrush x:Key="{x:Static SystemColors.WindowBrushKey}" Color="#2A2C3C"/>
-                        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#4B5AFF"/>
-                        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="White"/>
+                        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#A6A8B8"/>
+                        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="#1E1B2E"/>
                         <SolidColorBrush x:Key="{x:Static SystemColors.WindowTextBrushKey}" Color="White"/>
                     </ComboBox.Resources>
                 </ComboBox>
